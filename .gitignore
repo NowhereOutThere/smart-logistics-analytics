@@ -9,6 +9,12 @@ __pycache__/
 # Raw data
 data/raw/
 
+# Logfiles
+projectLog/
+
+# Notebooks
+notebooks/00_data_exploration.ipynb
+
 # Distribution / packaging
 .Python
 build/
