@@ -1,6 +1,6 @@
 # Smart Logistics Analytics & Delivery Performance
 
-A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python**, **Pandas**, and **SQL**.
+A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python**, **Pandas**, and **SQL** *(planned)*.
 
 ---
 
@@ -17,23 +17,29 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 * **Domain:** Supply Chain & Logistics Management
 
 ### Key Operational Fields:
-* **Order & Timestamps:** `Order_ID`, `Order_Date`, `Ship_Date`, `Delivery_Date`
-* **Logistics & Transit:** `Origin`, `Destination`, `Carrier`, `Shipping_Mode` *(e.g., Air, Sea, Road)*
-* **Financials & Volume:** `Shipment_Cost`, `Order_Value`, `Weight_kg`, `Quantity`
-* **Performance Metrics:** `Delivery_Status` *(On-Time, Delayed)*, `Calculated_Lead_Time`
+* **IDs & Relations:** `load_id`, `route_id`, `trip_id`
+* **Event Tracking:** `event_type` *(Pickup, Delivery)*, `scheduled_datetime`, `actual_datetime`, `on_time_flag`, `detention_minutes`
+* **Location:** `facility_id`, `location_city`, `location_state`
+* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
 
----
+
 
 ### Key Objectives:
 * **ETL & Data Cleaning:** Aggregating and prepping incomplete logistics datasets.
 * **Exploratory Data Analysis (EDA):** Identifying Key Performance Indicators (KPIs) across regions, products, and transit modes.
 * **Root Cause Analysis:** Pinpointing factors influencing shipment delays (progressing from descriptive to diagnostic analysis).
 
+
+
+## Key Insights
+
+ *Will be added once `01_delivery_performance.ipynb` is finalized, e.g. average lead time, on-time delivery rate, and the main drivers of delay.*
+
 ---
 
 ## Tech Stack
 
-* **Languages:** Python 3.x, SQL
+* **Languages:** Python 3.12.1
 * **Libraries:** Pandas, NumPy, Matplotlib, Seaborn
 * **Tools:** Jupyter Notebooks, Git / GitHub
 * *(Planned: Power BI for interactive dashboards)*
@@ -45,38 +51,76 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 The analysis is structured modularly across the following key areas:
 
 ```text
+├── data/
+│   ├── raw/                          # Raw input data (not tracked in git)
+│   └── processed/                    # Cleaned output from the ETL pipeline
+├── src/
+│   └── delivery_pipeline.py          # Extract/transform/load logic
 ├── notebooks/
-│   ├── 01_delivery_performance.ipynb # 🟡 In Progress | Core KPIs, average lead times & delay rates, wip
+│   ├── 01_delivery_performance.ipynb # 🟡 In Progress | Core KPIs, average lead times & delay rates
 │   ├── 02_temporal_patterns.ipynb    # ⚪ Planned     | Seasonality, trends & weekday analysis
 │   ├── 03_products_categories.ipynb  # ⚪ Planned     | Top revenue items & delay-prone products
 │   ├── 04_regional_analysis.ipynb    # ⚪ Planned     | Geographic distribution of volumes & times
-│   └── 05_correlations.ipynb         # ⚪ Planned     | Diagnostic analysis: Key drivers of delays
-├── README.md                   # Project documentation
-``` 
+│   └── 05_correlations.ipynb         # ⚪ Planned     | Diagnostic analysis: key drivers of delays
+├── tests/
+│   └── test_pipeline.py              # Unit tests for the ETL pipeline
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## Getting Started
+
+1. Clone the repo:
+   ```bash
+   git clone <repo-url>
+   cd <repo-name>
+   ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Place the raw data in `data/raw/` (see [Data Sources](#data-sources) above for where to get it).
+4. Run the ETL pipeline:
+   ```bash
+   python src/delivery_pipeline.py
+   ```
+5. Open the notebooks in `notebooks/` to explore the analysis.
+
+---
 
 ## Roadmap & Development Milestones
 * 🟡 Phase 1: Project Setup & Data Ingestion 
 
     * 🟢 Define repository architecture and folder layout 
 
-    * 🟢 Dataset selection, schema definition & synthetic data generation
+    * 🟢 Dataset selection & schema definition 
 
     * ⚪ Set up initial ETL pipeline for data cleaning and transformation 
 
-* 🟡 Phase 2: Exploratory Data Analysis (Jupyter Notebooks) 🟡
+* 🟡 Phase 2: Exploratory Data Analysis (Jupyter Notebooks) 
 
     * 🟡 01_delivery_performance.ipynb 
 
-    * ⚪ 02_temporal_patterns.ipynb ⚪
+    * ⚪ 02_temporal_patterns.ipynb 
 
-    * ⚪ 03_products_categories.ipynb ⚪
+    * ⚪ 03_products_categories.ipynb 
 
-    * ⚪ 04_regional_analysis.ipynb ⚪
+    * ⚪ 04_regional_analysis.ipynb 
 
-* ⚪ Phase 3: Diagnostic Analysis & Modeling ⚪
+* ⚪ Phase 3: Diagnostic Analysis & Modeling 
 
-    * ⚪ 05_correlations.ipynb (Root cause analysis of shipment delays) ⚪
+    * ⚪ 05_correlations.ipynb (Root cause analysis of shipment delays) 
 
-* ⚪ Phase 4: BI & Dashboarding ⚪
+* ⚪ Phase 4: BI & Dashboarding 
 
-    * ⚪ Build an interactive Power BI dashboard for executive summary ⚪
+    * ⚪ Build an interactive Power BI dashboard for executive summary 
+
+---
+
+## Author
+
+*Stefanie Häberle* - Junior Data Engineer *(in progress)*
+
+[LinkedIn](https://www.linkedin.com/in/stefanie-haeberle-msc) · [GitHub](https://github.com/NowhereOutThere) · stefanie.haeberle@freenet.de
