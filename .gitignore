@@ -6,8 +6,16 @@ __pycache__/
 # C extensions
 *.so
 
-# Raw data
-data/raw/
+# Rohdaten (Kaggle-Download, ggf. urheberrechtlich/lizenzrechtlich nicht zum Weiterverbreiten gedacht)
+data/raw/*
+!data/raw/.gitkeep
+
+# Generierte/abgeleitete Daten – wird durch die Pipeline neu erzeugt
+data/processed/*
+!data/processed/.gitkeep
+
+__pycache__/
+*.pyc
 
 # Logfiles
 projectLog/
