@@ -78,20 +78,31 @@ The analysis is structured modularly across the following key areas:
 ## Getting Started
 
 1. Clone the repo:
-   ```bash
+```bash
    git clone <repo-url>
    cd <repo-name>
-   ```
-2. Install dependencies:
-   ```bash
+```
+2. Create a virtual environment:
+```bash
+   python -m venv venv
+   venv\Scripts\activate        # Windows
+   source venv/bin/activate     # macOS/Linux
+```
+3. Install dependencies:
+```bash
    pip install -r requirements.txt
-   ```
-3. Place the raw data in `data/raw/` (see [Data Sources](#data-sources) above for where to get it).
-4. Run the ETL pipeline:
-   ```bash
+```
+4. Download the raw data from the [Logistics Operations Database](https://www.kaggle.com/datasets/yogape/logistics-operations-database/data)
+   on Kaggle and place the CSV files in `data/raw/`
+   (`loads.csv`, `trips.csv`, `delivery_events.csv`, `routes.csv`).
+5. Run the ETL pipeline:
+```bash
    python src/delivery_pipeline.py
-   ```
-5. Open the notebooks in `notebooks/` to explore the analysis.
+```
+6. Start Jupyter and open the notebooks in `notebooks/` to explore the analysis:
+```bash
+   jupyter notebook
+```
 
 ---
 
