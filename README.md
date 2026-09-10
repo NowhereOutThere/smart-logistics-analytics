@@ -25,15 +25,20 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 
 
 ### Key Objectives:
-* **ETL & Data Cleaning:** Aggregating and prepping incomplete logistics datasets.
+* **ETL & Data Cleaning:** AIntegrating, cleaning, transforming, and preparing logistics data for analysis.
 * **Exploratory Data Analysis (EDA):** Identifying Key Performance Indicators (KPIs) across regions, products, and transit modes.
-* **Root Cause Analysis:** Pinpointing factors influencing shipment delays (progressing from descriptive to diagnostic analysis).
+* **Delay Analysis:** Pinpointing factors influencing shipment delays (progressing from descriptive to diagnostic analysis).
 
 
 
 ## Key Insights
 
  *Will be added once `01_delivery_performance.ipynb` is finalized, e.g. average lead time, on-time delivery rate, and the main drivers of delay.*
+ - Average delivery lead time: X hours
+- On-time delivery rate: X%
+- X% of deliveries were delayed
+- Region X showed the highest average delay
+- Transport type X had the shortest/longest average delivery time
 
 ---
 
@@ -54,14 +59,14 @@ The analysis is structured modularly across the following key areas:
 ├── data/
 │   ├── raw/                          # Raw input data (not tracked in git)
 │   └── processed/                    # Cleaned output from the ETL pipeline
-├── src/
-│   └── delivery_pipeline.py          # Extract/transform/load logic
 ├── notebooks/
 │   ├── 01_delivery_performance.ipynb # 🟡 In Progress | Core KPIs, average lead times & delay rates
 │   ├── 02_temporal_patterns.ipynb    # ⚪ Planned     | Seasonality, trends & weekday analysis
 │   ├── 03_products_categories.ipynb  # ⚪ Planned     | Top revenue items & delay-prone products
 │   ├── 04_regional_analysis.ipynb    # ⚪ Planned     | Geographic distribution of volumes & times
 │   └── 05_correlations.ipynb         # ⚪ Planned     | Diagnostic analysis: key drivers of delays
+├── src/
+│   └── delivery_pipeline.py          # Extract/transform/load logic
 ├── tests/
 │   └── test_pipeline.py              # Unit tests for the ETL pipeline
 ├── requirements.txt
@@ -121,6 +126,8 @@ The analysis is structured modularly across the following key areas:
 
 ## Author
 
-*Stefanie Häberle* - Junior Data Engineer *(in progress)*
+*Stefanie Häberle*
+
+M.Sc. Informatik · Data Engineering & Data Analytics
 
 [LinkedIn](https://www.linkedin.com/in/stefanie-haeberle-msc) · [GitHub](https://github.com/NowhereOutThere) · stefanie.haeberle@freenet.de
