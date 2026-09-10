@@ -1,6 +1,6 @@
 # Smart Logistics Analytics & Delivery Performance
 
-A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python**, **Pandas**, and **SQL** *(planned)*.
+A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python**, **Pandas**, with **SQL** and **Power BI** planned for a later phase.
 
 ---
 
@@ -16,17 +16,21 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 * **Dataset Size:** ~14,800+ operational shipment records
 * **Domain:** Supply Chain & Logistics Management
 
-### Key Operational Fields:
+The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. `01_delivery_performance.ipynb` currently uses a subset of these:
+
+### Key Operational Fields (used in `01_delivery_performance.ipynb`):
 * **IDs & Relations:** `load_id`, `route_id`, `trip_id`
 * **Event Tracking:** `event_type` *(Pickup, Delivery)*, `scheduled_datetime`, `actual_datetime`, `on_time_flag`, `detention_minutes`
 * **Location:** `facility_id`, `location_city`, `location_state`
 * **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
 
+Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be brought in progressively as further notebooks are added - see [Roadmap](#roadmap--development-milestones).
+
 
 
 ### Key Objectives:
-* **ETL & Data Cleaning:** AIntegrating, cleaning, transforming, and preparing logistics data for analysis.
-* **Exploratory Data Analysis (EDA):** Identifying Key Performance Indicators (KPIs) across regions, products, and transit modes.
+* **ETL & Data Cleaning:** Integrating, cleaning, transforming, and preparing logistics data for analysis.
+* **Exploratory Data Analysis (EDA):** Identifying Key Performance Indicators (KPIs) across regions, transport types, and customers
 * **Delay Analysis:** Pinpointing factors influencing shipment delays (progressing from descriptive to diagnostic analysis).
 
 
@@ -44,31 +48,31 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 
 ## Tech Stack
 
-* **Languages:** Python 3.12.1
-* **Libraries:** Pandas, NumPy, Matplotlib, Seaborn
+* **Languages:** Python 3.12.1, SQL *(planned)*
+* **Libraries:** Pandas, Matplotlib
 * **Tools:** Jupyter Notebooks, Git / GitHub
 * *(Planned: Power BI for interactive dashboards)*
 
 ---
 
-##  Repository Structure
-
-The analysis is structured modularly across the following key areas:
+## Repository Structure
 
 ```text
 ├── data/
-│   ├── raw/                          # Raw input data (not tracked in git)
-│   └── processed/                    # Cleaned output from the ETL pipeline
-├── notebooks/
-│   ├── 01_delivery_performance.ipynb # 🟡 In Progress | Core KPIs, average lead times & delay rates
-│   ├── 02_temporal_patterns.ipynb    # ⚪ Planned     | Seasonality, trends & weekday analysis
-│   ├── 03_products_categories.ipynb  # ⚪ Planned     | Top revenue items & delay-prone products
-│   ├── 04_regional_analysis.ipynb    # ⚪ Planned     | Geographic distribution of volumes & times
-│   └── 05_correlations.ipynb         # ⚪ Planned     | Diagnostic analysis: key drivers of delays
+│   ├── raw/                              # Raw input data (not tracked in git)
+│   └── processed/                        # Cleaned output from the ETL pipeline (not tracked in git)
 ├── src/
-│   └── delivery_pipeline.py          # Extract/transform/load logic
+│   └── delivery_pipeline.py              # Extract/transform/load logic
+├── notebooks/
+│   ├── 01_delivery_performance.ipynb     # 🟡 In Progress | Core KPIs: avg. lead time & delay rates
+│   ├── 02_temporal_patterns.ipynb        # ⚪ Planned     | Seasonality, trends & weekday analysis
+│   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned     | Delay/duration by truck, trailer & fuel efficiency
+│   ├── 04_regional_analysis.ipynb        # ⚪ Planned     | Region & facility-level performance
+│   ├── 05_customer_analysis.ipynb        # ⚪ Planned     | Delay/revenue by customer segment
+│   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional    | Driver performance & safety incidents
+│   └── 07_correlations.ipynb             # ⚪ Planned     | Diagnostic analysis: key drivers of delays
 ├── tests/
-│   └── test_pipeline.py              # Unit tests for the ETL pipeline
+│   └── test_pipeline.py                  # Unit tests for the ETL pipeline
 ├── requirements.txt
 └── README.md
 ```
@@ -82,7 +86,7 @@ The analysis is structured modularly across the following key areas:
    git clone <repo-url>
    cd <repo-name>
 ```
-2. Create a virtual environment:
+2. (Optional but recommended) Create a virtual environment:
 ```bash
    python -m venv venv
    venv\Scripts\activate        # Windows
@@ -107,31 +111,25 @@ The analysis is structured modularly across the following key areas:
 ---
 
 ## Roadmap & Development Milestones
-* 🟡 Phase 1: Project Setup & Data Ingestion 
+* 🟢 Phase 1: Project Setup & Data Ingestion 
 
     * 🟢 Define repository architecture and folder layout 
-
     * 🟢 Dataset selection & schema definition 
+    * 🟢 Set up initial ETL pipeline for data cleaning and transformation 
 
-    * ⚪ Set up initial ETL pipeline for data cleaning and transformation 
+* 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
+  * 🟡 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
+  * ⚪ `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
+  * ⚪ `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
+  * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
+  * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
 
-* 🟡 Phase 2: Exploratory Data Analysis (Jupyter Notebooks) 
+* ⚪ **Phase 3: Diagnostic Analysis & Modeling**
+  * ⚪ `06_driver_safety_analysis.ipynb` *(optional)* - driver performance & safety incidents
+  * ⚪ `07_correlations.ipynb` - root cause analysis of shipment delays across all dimensions
 
-    * 🟡 01_delivery_performance.ipynb 
-
-    * ⚪ 02_temporal_patterns.ipynb 
-
-    * ⚪ 03_products_categories.ipynb 
-
-    * ⚪ 04_regional_analysis.ipynb 
-
-* ⚪ Phase 3: Diagnostic Analysis & Modeling 
-
-    * ⚪ 05_correlations.ipynb (Root cause analysis of shipment delays) 
-
-* ⚪ Phase 4: BI & Dashboarding 
-
-    * ⚪ Build an interactive Power BI dashboard for executive summary 
+* ⚪ **Phase 4: BI & Dashboarding**
+  * ⚪ Build an interactive Power BI dashboard for executive summary
 
 ---
 
