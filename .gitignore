@@ -23,6 +23,9 @@ projectLog/
 # Notebooks
 notebooks/00_data_exploration.ipynb
 
+# Folder
+results/
+
 # Distribution / packaging
 .Python
 build/
