@@ -16,9 +16,8 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
    
-# __file__ ist der Pfad dieser Datei (src/delivery_pipeline.py).
-# .parent -> src/, .parent.parent -> Projekt-Root. Damit sind die Pfade
-# immer korrekt, unabhängig davon, von wo aus das Skript/Notebook läuft.
+# __file__ is path of this file (src/delivery_pipeline.py).
+# .parent -> src/, .parent.parent -> project-root. This ensures the paths are always correct, regardless of where the script or notebook is running.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
