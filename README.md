@@ -36,13 +36,9 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 
 ## Key Insights
-
- *Will be added once `01_delivery_performance.ipynb` is finalized, e.g. average lead time, on-time delivery rate, and the main drivers of delay.*
- - Average delivery lead time: X hours
-- On-time delivery rate: X%
-- X% of deliveries were delayed
-- Region X showed the highest average delay
-- Transport type X had the shortest/longest average delivery time
+- Average delivery lead time: 3.00 hours 
+- 64.07% of deliveries were delayed
+- Region NY showed the highest average delay
 
 ---
 
@@ -135,8 +131,6 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 ## Author
 
-*Stefanie Häberle*
-
-M.Sc. Informatik · Data Engineering & Data Analytics
+*Stefanie Häberle* -  M.Sc. Informatik · aspiring Data Engineer
 
 [LinkedIn](https://www.linkedin.com/in/stefanie-haeberle-msc) · [GitHub](https://github.com/NowhereOutThere) · stefanie.haeberle@freenet.de
