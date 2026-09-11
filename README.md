@@ -38,7 +38,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 ## Key Insights
 - Average delivery time: 26.68 hours 
 - 67.04% of deliveries were delayed
-- Average delay (delayed deliveries only)
+- Average delay (delayed deliveries only): 3.00 hours
 
 ---
 
