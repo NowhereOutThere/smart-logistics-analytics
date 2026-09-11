@@ -45,7 +45,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 ## Tech Stack
 
 * **Languages:** Python 3.12.1, SQL *(planned)*
-* **Libraries:** Pandas, Matplotlib, Seaborn
+* **Libraries:** Pandas, Matplotlib, Seaborn, Pytest
 * **Tools:** Jupyter Notebooks, Git / GitHub
 * *(Planned: Power BI for interactive dashboards)*
 
@@ -126,6 +126,17 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 * ⚪ **Phase 4: BI & Dashboarding**
   * ⚪ Build an interactive Power BI dashboard for executive summary
+
+---
+
+## Testing
+
+The ETL pipeline is covered by automated unit tests.
+
+To run the tests:
+```bash
+pytest
+```` 
 
 ---
 
