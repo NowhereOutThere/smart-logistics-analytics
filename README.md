@@ -57,20 +57,21 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 ├── data/
 │   ├── raw/                              # Raw input data (not tracked in git)
 │   └── processed/                        # Cleaned output from the ETL pipeline (not tracked in git)
-├── src/
-│   └── delivery_pipeline.py              # Extract/transform/load logic
 ├── notebooks/
-│   ├── 01_delivery_performance.ipynb     # 🟡 In Progress | Core KPIs: avg. lead time & delay rates
+│   ├── 01_delivery_performance.ipynb     # 🟢 Finished    | Core KPIs: avg. lead time & delay rates
 │   ├── 02_temporal_patterns.ipynb        # ⚪ Planned     | Seasonality, trends & weekday analysis
 │   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned     | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # ⚪ Planned     | Region & facility-level performance
 │   ├── 05_customer_analysis.ipynb        # ⚪ Planned     | Delay/revenue by customer segment
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional    | Driver performance & safety incidents
 │   └── 07_correlations.ipynb             # ⚪ Planned     | Diagnostic analysis: key drivers of delays
+├── src/
+│   └── delivery_pipeline.py              # Extract/transform/load logic
 ├── tests/
-│   └── test_pipeline.py                  # Unit tests for the ETL pipeline
-├── requirements.txt
-└── README.md
+│   └── test_delivery_pipeline.py         # Unit tests for the ETL pipeline
+├── pytest.ini
+├── README.md
+└── requirements.txt
 ```
 
 ---
@@ -114,7 +115,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
     * 🟢 Set up initial ETL pipeline for data cleaning and transformation 
 
 * 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
-  * 🟡 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
+  * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
   * ⚪ `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
   * ⚪ `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
