@@ -30,3 +30,8 @@ results/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+
+# Pytest / Test Caches
+.pytest_cache/
+.coverage
+htmlcov/
