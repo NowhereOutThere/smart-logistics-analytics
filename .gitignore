@@ -3,12 +3,12 @@ __pycache__/
 *.py[cod]
 *.pyc
 
-# Raw data (Kaggle download, not meant for redistribution)
+# Data directory - ignore everything
 data/raw/*
-!data/raw/.gitkeep
-
-# Generated/derived data (recreated by the pipeline)
 data/processed/*
+
+# Except for .gitkeep files
+!data/raw/.gitkeep
 !data/processed/.gitkeep
 
 # Jupyter
