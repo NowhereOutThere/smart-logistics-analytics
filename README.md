@@ -45,7 +45,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 ## Tech Stack
 
 * **Languages:** Python 3.12.1, SQL *(planned)*
-* **Libraries:** Pandas, Matplotlib
+* **Libraries:** Pandas, Matplotlib, Seaborn
 * **Tools:** Jupyter Notebooks, Git / GitHub
 * *(Planned: Power BI for interactive dashboards)*
 
