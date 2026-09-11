@@ -13,7 +13,10 @@ from pathlib import Path
 
 import pandas as pd
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
+logging.basicConfig(
+    level=logging.INFO, 
+    format="%(asctime)s | %(levelname)s | %(message)s"
+    )
 logger = logging.getLogger(__name__)
    
 # __file__ is path of this file (src/delivery_pipeline.py).
@@ -22,7 +25,9 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
-PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
+PROCESSED_DATA_PATH = (
+     PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
+)
 
 EVENT_COLS = [
     "event_id", "event_type", "facility_id", "scheduled_datetime",
@@ -32,7 +37,10 @@ EVENT_COLS = [
 PIVOT_VALUES = [c for c in EVENT_COLS if c not in ("event_id", "event_type")]
 
 
-def run_pipeline(raw_dir: Path = RAW_DATA_DIR, output_path: Path = PROCESSED_DATA_PATH) -> pd.DataFrame:
+def run_pipeline(
+    raw_dir: Path = RAW_DATA_DIR, 
+    output_path: Path = PROCESSED_DATA_PATH
+    ) -> pd.DataFrame:
     """Run the full extract -> transform -> load pipeline and return the result."""
     raw = extract(raw_dir)
     df = transform(raw)
@@ -87,7 +95,10 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     """Pivot pickup/delivery events into columns so each load is a single row."""
     # Merges create load_id_x/load_id_y suffixes since both `loads` and 
     # `delivery_events` contain a load_id column, load_id_x is the correct one
-    df = df.rename(columns={"load_id_x": "load_id"}).drop(columns=["load_id_y"], errors="ignore")
+    df = (
+          df.rename(columns={"load_id_x": "load_id"})
+          .drop(columns=["load_id_y"], errors="ignore")
+    )
 
     events_pivoted = df.pivot_table(
         index="load_id", columns="event_type", values=PIVOT_VALUES, aggfunc="first"
@@ -101,10 +112,15 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     # (e.g. pickup_scheduled_datetime, delivery_scheduled_datetime)
     events_pivoted = events_pivoted.reset_index()
 
-    load_base_info = df.drop(columns=EVENT_COLS).groupby("load_id", as_index=False).first()
+    load_base_info = (
+          df.drop(columns=EVENT_COLS).
+          groupby("load_id", as_index=False).
+          first()
+          )
     flat = pd.merge(load_base_info, events_pivoted, on="load_id", how="left")
 
-    assert flat["load_id"].is_unique, "Expected exactly one row per load_id after flattening"
+    assert flat["load_id"].is_unique, \
+    "Expected exactly one row per load_id after flattening"
     logger.info("Flattened to %s loads (from %s event rows)", len(flat), len(df))
     return flat
 
@@ -113,7 +129,8 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
     """Compute delivery duration (hours) and delay (hours) per load."""
     df = df.copy()
     df["delivery_duration_hours"] = (
-        (df["delivery_actual_datetime"] - df["pickup_actual_datetime"]).dt.total_seconds() / 3600
+        (df["delivery_actual_datetime"] - df["pickup_actual_datetime"])
+        .dt.total_seconds() / 3600
     ).round(2)
 
     # Note the distinction: delivery_duration_hours measures how long the
@@ -121,7 +138,8 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
     # how late it was relative to the *scheduled* delivery time. Two independent metrics
 
     df["delivery_delay_hours"] = (
-        (df["delivery_actual_datetime"] - df["delivery_scheduled_datetime"]).dt.total_seconds() / 3600
+        (df["delivery_actual_datetime"] - df["delivery_scheduled_datetime"])
+        .dt.total_seconds() / 3600
     ).round(2)
     df["is_delayed_delivery"] = df["delivery_delay_hours"] > 0
     return df
