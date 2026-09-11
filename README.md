@@ -144,5 +144,3 @@ pytest
 ## Author
 
 *Stefanie Häberle* -  M.Sc. Informatik · aspiring Data Engineer
-
-[LinkedIn](https://www.linkedin.com/in/stefanie-haeberle-msc) · [GitHub](https://github.com/NowhereOutThere) · stefanie.haeberle@freenet.de
