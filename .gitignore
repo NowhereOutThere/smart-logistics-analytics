@@ -23,6 +23,7 @@ env/
 # Logs / local results
 projectLog/
 results/
+docs/
 
 # IDE
 .vscode/
