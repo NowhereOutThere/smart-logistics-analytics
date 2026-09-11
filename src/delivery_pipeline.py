@@ -17,7 +17,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(
 logger = logging.getLogger(__name__)
    
 # __file__ is path of this file (src/delivery_pipeline.py).
-# .parent -> src/, .parent.parent -> project-root. This ensures the paths are always correct, regardless of where the script or notebook is running.
+# .parent -> src/, .parent.parent -> project-root. This ensures the paths are always 
+# correct, regardless of where the script or notebook is running.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
@@ -84,8 +85,8 @@ def merge_sources(tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     """Pivot pickup/delivery events into columns so each load is a single row."""
-    # Merges create load_id_x/load_id_y suffixes since both `loads` and `delivery_events` contain a load_id column,
-    # load_id_x is the correct one
+    # Merges create load_id_x/load_id_y suffixes since both `loads` and 
+    # `delivery_events` contain a load_id column, load_id_x is the correct one
     df = df.rename(columns={"load_id_x": "load_id"}).drop(columns=["load_id_y"], errors="ignore")
 
     events_pivoted = df.pivot_table(
@@ -95,7 +96,8 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
         f"{event_type.lower()}_{field}" for field, event_type in events_pivoted.columns
     ]
 
-    # Pivots the table from "one row per event" (Pickup and Delivery separately) to "one row per load", with event fields becoming separate columns
+    # Pivots the table from "one row per event" (Pickup and Delivery separately) to 
+    # "one row per load", with event fields becoming separate columns
     # (e.g. pickup_scheduled_datetime, delivery_scheduled_datetime)
     events_pivoted = events_pivoted.reset_index()
 
@@ -116,7 +118,7 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
 
     # Note the distinction: delivery_duration_hours measures how long the
     # delivery took (pickup -> delivery), while delivery_delay_hours measures
-    # how late it was relative to the *scheduled* delivery time. Two independent metrics.
+    # how late it was relative to the *scheduled* delivery time. Two independent metrics
 
     df["delivery_delay_hours"] = (
         (df["delivery_actual_datetime"] - df["delivery_scheduled_datetime"]).dt.total_seconds() / 3600
