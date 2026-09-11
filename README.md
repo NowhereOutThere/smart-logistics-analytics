@@ -36,9 +36,9 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 
 ## Key Insights
-- Average delivery lead time: 3.00 hours 
-- 64.07% of deliveries were delayed
-- Region NY showed the highest average delay
+- Average delivery time: 26.68 hours 
+- 67.04% of deliveries were delayed
+- Average delay (delayed deliveries only)
 
 ---
 
