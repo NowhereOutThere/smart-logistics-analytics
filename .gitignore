@@ -24,6 +24,7 @@ env/
 projectLog/
 results/
 docs/
+images/
 
 # IDE
 .vscode/
