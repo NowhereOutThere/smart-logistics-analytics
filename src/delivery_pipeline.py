@@ -84,6 +84,8 @@ def merge_sources(tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
 def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     """Pivot pickup/delivery events into columns so each load is a single row."""
+    # Merges create load_id_x/load_id_y suffixes since both `loads` and `delivery_events` contain a load_id column,
+    # load_id_x is the correct one
     df = df.rename(columns={"load_id_x": "load_id"}).drop(columns=["load_id_y"], errors="ignore")
 
     events_pivoted = df.pivot_table(
@@ -92,6 +94,9 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     events_pivoted.columns = [
         f"{event_type.lower()}_{field}" for field, event_type in events_pivoted.columns
     ]
+
+    # Pivots the table from "one row per event" (Pickup and Delivery separately) to "one row per load", with event fields becoming separate columns
+    # (e.g. pickup_scheduled_datetime, delivery_scheduled_datetime)
     events_pivoted = events_pivoted.reset_index()
 
     load_base_info = df.drop(columns=EVENT_COLS).groupby("load_id", as_index=False).first()
@@ -108,6 +113,11 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df["delivery_duration_hours"] = (
         (df["delivery_actual_datetime"] - df["pickup_actual_datetime"]).dt.total_seconds() / 3600
     ).round(2)
+
+    # Note the distinction: delivery_duration_hours measures how long the
+    # delivery took (pickup -> delivery), while delivery_delay_hours measures
+    # how late it was relative to the *scheduled* delivery time. Two independent metrics.
+
     df["delivery_delay_hours"] = (
         (df["delivery_actual_datetime"] - df["delivery_scheduled_datetime"]).dt.total_seconds() / 3600
     ).round(2)
