@@ -72,7 +72,7 @@ def transform(
         include_routes: bool = True
         ) -> pd.DataFrame:
     """Merge, flatten, and enrich the raw tables into one row per load."""
-    merged = merge_sources(tables, include_routes = include_routes)
+    merged = merge_sources(tables, include_routes=include_routes)
     flat = flatten_events_per_load(merged)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
