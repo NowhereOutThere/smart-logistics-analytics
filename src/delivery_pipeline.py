@@ -32,10 +32,14 @@ EVENT_COLS = [
 PIVOT_VALUES = [c for c in EVENT_COLS if c not in ("event_id", "event_type")]
 
 
-def run_pipeline(raw_dir: Path = RAW_DATA_DIR, output_path: Path = PROCESSED_DATA_PATH) -> pd.DataFrame:
+def run_pipeline(
+    raw_dir: Path = RAW_DATA_DIR, 
+    output_path: Path = PROCESSED_DATA_PATH,
+    include_routes: bool = True,
+    ) -> pd.DataFrame:
     """Run the full extract -> transform -> load pipeline and return the result."""
-    raw = extract(raw_dir)
-    df = transform(raw)
+    raw = extract(raw_dir, include_routes=include_routes)
+    df = transform(raw, include_routes=include_routes)
     load(df, output_path)
     return df
 
@@ -44,10 +48,13 @@ def run_pipeline(raw_dir: Path = RAW_DATA_DIR, output_path: Path = PROCESSED_DAT
 # Extract
 # ---------------------------------------------------------------------------
 
-def extract(raw_dir: Path) -> dict[str, pd.DataFrame]:
-    """Read the four raw source tables and log their shapes."""
+def extract(raw_dir: Path, include_routes: bool = True) -> dict[str, pd.DataFrame]:
+    """Read the raw source tables and log their shapes."""
+    names = ["loads", "trips", "delivery_events"]
+    if include_routes:
+        names.append("routes")
     tables = {}
-    for name in ["loads", "trips", "delivery_events", "routes"]:
+    for name in names:
         path = raw_dir / f"{name}.csv"
         if not path.exists():
             raise FileNotFoundError(f"Expected source file not found: {path}")
@@ -60,20 +67,28 @@ def extract(raw_dir: Path) -> dict[str, pd.DataFrame]:
 # Transform
 # ---------------------------------------------------------------------------
 
-def transform(tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
+def transform(
+        tables: dict[str, pd.DataFrame], 
+        include_routes: bool = True
+        ) -> pd.DataFrame:
     """Merge, flatten, and enrich the raw tables into one row per load."""
-    merged = merge_sources(tables)
+    merged = merge_sources(tables, include_routes = include_routes)
     flat = flatten_events_per_load(merged)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
     return clean
 
 
-def merge_sources(tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
+def merge_sources(
+        tables: dict[str, pd.DataFrame],
+        include_routes: bool = True
+        ) -> pd.DataFrame:
     """Join loads/routes/trips/delivery_events into one long table (1 row per event)."""
+    df = tables["loads"]
+    if include_routes:
+        df = df.merge(tables["routes"], how="left", on="route_id")
     df = (
-        tables["loads"]
-        .merge(tables["routes"], how="left", on="route_id")
+        df
         .merge(tables["trips"], how="left", on="load_id")
         .merge(tables["delivery_events"], how="left", on="trip_id")
     )
