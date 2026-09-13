@@ -2,7 +2,8 @@ import pandas as pd
 import pytest
 
 # Import functions from the pipeline
-from src.delivery_pipeline import add_performance_metrics, drop_inconsistent_timestamps
+from src.delivery_pipeline import (add_performance_metrics, drop_inconsistent_timestamps, 
+                                   merge_sources, extract)
 
 
 def test_add_performance_metrics_calculates_correctly():
@@ -63,3 +64,96 @@ def test_add_performance_metrics_handles_on_time():
     assert result.loc[0, "delivery_delay_hours"] == -0.5
     assert result.loc[0, "delivery_delay_hours"] < 0.0
     assert result.loc[0, "is_delayed_delivery"] == False
+
+
+def test_merge_sources_excludes_routes_when_flag_is_false():
+    """Checks that routes columns are absent when include_routes=False."""
+    # 1. Arrange: Four dummy tables (loads, trips, delivery_events, routes)
+    tables = {
+        "loads": pd.DataFrame({"load_id": [1], "route_id": [10]}),
+        "trips": pd.DataFrame({"load_id": [1], "trip_id": [100]}),
+        "delivery_events": pd.DataFrame({
+            "trip_id": [100],
+            "scheduled_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
+            "actual_datetime": [pd.Timestamp("2026-09-10 11:00:00")]}),
+        "routes": pd.DataFrame({
+            "route_id": [10], 
+            "origin_city": ["Hamburg"],
+        })
+    }
+
+    # 2. Act: Call pipeline-function
+    result = merge_sources(tables, include_routes=False)
+
+    # 3. Assert: Check, whether results are correct
+    assert "origin_city" not in result.columns
+    assert "load_id" in result.columns
+    assert "trip_id" in result.columns
+    assert "scheduled_datetime" in result.columns
+    assert result.loc[0, "trip_id"] == 100
+
+
+
+def test_merge_sources_includes_routes_when_flag_is_true():
+    """Checks merge function"""
+    # 1. Arrange: Four dummy tables (loads, trips, delivery_events, routes)
+    tables = {
+        "loads": pd.DataFrame({"load_id": [1], "route_id": [10]}),
+        "trips": pd.DataFrame({"load_id": [1], "trip_id": [100]}),
+        "delivery_events": pd.DataFrame({
+            "trip_id": [100],
+            "scheduled_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
+            "actual_datetime": [pd.Timestamp("2026-09-10 11:00:00")]}),
+        "routes": pd.DataFrame({
+            "route_id": [10], 
+            "origin_city": ["Hamburg"],
+        })
+    }
+
+    # 2. Act: Call pipeline-function
+    result = merge_sources(tables, include_routes=True)
+
+    # 3. Assert: Check, whether results are correct
+    assert "origin_city" in result.columns
+    assert "load_id" in result.columns
+    assert "trip_id" in result.columns
+    assert "scheduled_datetime" in result.columns
+    assert result.loc[0, "origin_city"] == "Hamburg"
+    assert result.loc[0, "trip_id"] == 100
+
+
+def test_extract_excludes_routes_when_flag_is_false(tmp_path):
+    """Checks that the routes table is not loaded when include_routes=False."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_routes=False)
+
+    # 3. Assert: Check, whether results are correct
+    assert "routes" not in result
+    assert "loads" in result
+    assert "trips" in result
+    assert "delivery_events" in result
+
+
+
+def test_extract_includes_routes_when_flag_is_true(tmp_path):
+    """Checks extract function"""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_routes=True)
+
+    # 3. Assert: Check, whether results are correct
+    assert "routes" in result
+    assert "loads" in result
+    assert "trips" in result
+    assert "delivery_events" in result
