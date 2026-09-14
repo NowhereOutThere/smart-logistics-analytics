@@ -24,6 +24,13 @@ The full schema covers 14 tables across drivers, fleet equipment, customers, fac
 * **Location:** `facility_id`, `location_city`, `location_state`
 * **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
 
+### Key Operational Fields (used in `02_temporal_patterns.ipynb`):
+* **IDs & Relations:** `load_id`, `trip_id`
+* **Timestamps:** `pickup_actual_datetime`, `delivery_scheduled_datetime`, `delivery_actual_datetime`
+* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
+* **Temporal Features (derived in-notebook):** `pickup_day_of_week`, `pickup_month`, `pickup_year_month`, `pickup_season`
+
+
 Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be brought in progressively as further notebooks are added - see [Roadmap](#roadmap--development-milestones).
 
 
@@ -39,6 +46,8 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 - Average delivery time: 26.68 hours 
 - 67.04% of deliveries were delayed
 - Average delay (delayed deliveries only): 3.00 hours
+
+- - Delays are remarkably consistent across months, year-months, and seasons, no strong seasonal pattern 
 
 ---
 
@@ -58,13 +67,13 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 │   ├── raw/                              # Raw input data (not tracked in git)
 │   └── processed/                        # Cleaned output from the ETL pipeline (not tracked in git)
 ├── notebooks/
-│   ├── 01_delivery_performance.ipynb     # 🟢 Finished    | Core KPIs: avg. lead time & delay rates
-│   ├── 02_temporal_patterns.ipynb        # ⚪ Planned     | Seasonality, trends & weekday analysis
-│   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned     | Delay/duration by truck, trailer & fuel efficiency
-│   ├── 04_regional_analysis.ipynb        # ⚪ Planned     | Region & facility-level performance
-│   ├── 05_customer_analysis.ipynb        # ⚪ Planned     | Delay/revenue by customer segment
-│   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional    | Driver performance & safety incidents
-│   └── 07_correlations.ipynb             # ⚪ Planned     | Diagnostic analysis: key drivers of delays
+│   ├── 01_delivery_performance.ipynb     # 🟢 Finished        | Core KPIs: avg. lead time & delay rates
+│   ├── 02_temporal_patterns.ipynb        # 🟡 In Progress     | Seasonality, trends & weekday analysis
+│   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned         | Delay/duration by truck, trailer & fuel efficiency
+│   ├── 04_regional_analysis.ipynb        # ⚪ Planned         | Region & facility-level performance
+│   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
+│   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
+│   └── 07_correlations.ipynb             # ⚪ Planned         | Diagnostic analysis: key drivers of delays
 ├── src/
 │   └── delivery_pipeline.py              # Extract/transform/load logic
 ├── tests/
@@ -116,7 +125,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 * 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
-  * ⚪ `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
+  * 🟡 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
   * ⚪ `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
   * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
