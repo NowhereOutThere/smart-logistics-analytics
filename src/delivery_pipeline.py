@@ -23,6 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
+PROCESSED_DATA_PATH_TEMPORAL = PROJECT_ROOT / "data" / "processed" / "clean_temporal_patterns.csv"
 
 EVENT_COLS = [
     "event_id", "event_type", "facility_id", "scheduled_datetime",
