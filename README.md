@@ -13,7 +13,7 @@ In the logistics industry, on-time delivery is a critical success factor. This p
 The analysis is based on the open-source **[Logistics Operations Database](https://www.kaggle.com/datasets/yogape/logistics-operations-database/data)** available on Kaggle.
 
 * **Source:** Kaggle (by Yogape)
-* **Dataset Size:** ~14,800+ operational shipment records
+* **Dataset Size:** ~85,000+ operational shipment records
 * **Domain:** Supply Chain & Logistics Management
 
 The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. `01_delivery_performance.ipynb` currently uses a subset of these:
