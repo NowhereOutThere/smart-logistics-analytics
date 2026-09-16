@@ -13,17 +13,18 @@ transformations beyond what the pipeline already does.
 
 - **KPI cards:** average delivery duration, share of delayed deliveries
 - **Delivery duration by region** (bar chart)
-- **State → city drill-down** on delivery duration, for a closer look at
+- **State -> city drill-down** on delivery duration, for a closer look at
   regions that stand out in the notebook analysis (e.g. NY, WA)
 
 ## Screenshots
 
 ![Dashboard overview](screenshots/overview.png)
+*Overview: average delivery duration, delay rate, and regional breakdown.*
 
 <details>
-<summary>Regional drill-down</summary>
+<summary>Regional drill-down (coming soon)</summary>
 
-![Regional drill-down](screenshots/regional_drilldown.png)
+*Screenshot not yet added.*
 
 </details>
 
@@ -37,5 +38,5 @@ doesn't exist yet (see main [README](../../README.md#getting-started)).
 ## Status
 
 🟡 Early version. Covers the same core KPIs as `01_delivery_performance.ipynb`.
-Dashboards for other notebooks will live in their own subfolders -- see the
+Dashboards for other notebooks will live in their own subfolders - see the
 [dashboard index](../README.md) for the full list.
