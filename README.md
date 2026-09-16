@@ -8,21 +8,15 @@ A hands-on data analytics project exploring logistics data, delivery lead times,
 
 In the logistics industry, on-time delivery is a critical success factor. This project analyzes heterogeneous logistics data to identify supply chain bottlenecks, uncover temporal patterns in delays, and derive data-driven insights for process optimization.
 
-##  Data Source & Schema
+## Data Source & Schema
 
 The analysis is based on the open-source **[Logistics Operations Database](https://www.kaggle.com/datasets/yogape/logistics-operations-database/data)** available on Kaggle.
 
 * **Source:** Kaggle (by Yogape)
-* **Dataset Size:** ~14,800+ operational shipment records
+* **Dataset Size:** ~85,000+ operational shipment records
 * **Domain:** Supply Chain & Logistics Management
 
-The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. `01_delivery_performance.ipynb` currently uses a subset of these:
-
-### Key Operational Fields (used in `01_delivery_performance.ipynb`):
-* **IDs & Relations:** `load_id`, `route_id`, `trip_id`
-* **Event Tracking:** `event_type` *(Pickup, Delivery)*, `scheduled_datetime`, `actual_datetime`, `on_time_flag`, `detention_minutes`
-* **Location:** `facility_id`, `location_city`, `location_state`
-* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
+The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. Each notebook uses a subset of these -- see the "Data Basis" section at the top of each notebook for the exact fields and tables used.
 
 Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be brought in progressively as further notebooks are added - see [Roadmap](#roadmap--development-milestones).
 
@@ -42,6 +36,15 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 ---
 
+
+## Dashboard
+
+An interactive Power BI dashboard complements the notebook analysis --
+see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
+
+
+---
+
 ## Tech Stack
 
 * **Languages:** Python 3.12.1, SQL *(planned)*
@@ -54,6 +57,12 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 ## Repository Structure
 
 ```text
+├── dashboard/
+│   ├── README.md                          # Index linking to individual dashboards
+│   └── 01_delivery_performance/
+│       ├── delivery_performance.pbix
+│       ├── README.md                      # Dashboard-specific details
+│       └── screenshots/
 ├── data/
 │   ├── raw/                              # Raw input data (not tracked in git)
 │   └── processed/                        # Cleaned output from the ETL pipeline (not tracked in git)
@@ -137,7 +146,7 @@ The ETL pipeline is covered by automated unit tests.
 To run the tests:
 ```bash
 pytest
-```` 
+``` 
 
 ---
 
