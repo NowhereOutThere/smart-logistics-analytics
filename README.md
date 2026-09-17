@@ -39,7 +39,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 ## Dashboard
 
-An interactive Power BI dashboard complements the notebook analysis --
+An interactive Power BI dashboard complements the notebook analysis -
 see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 
 
@@ -134,9 +134,9 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * ⚪ `06_driver_safety_analysis.ipynb` *(optional)* - driver performance & safety incidents
   * ⚪ `07_correlations.ipynb` - root cause analysis of shipment delays across all dimensions
 
-* ⚪ **Phase 4: BI & Dashboarding**
-  * ⚪ Build an interactive Power BI dashboard for executive summary
-
+* 🟡 **Phase 4: BI & Dashboarding**
+  * 🟢 `01_delivery_performance` dashboard -- see [dashboard index](dashboard/README.md)
+  * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
 ## Testing
@@ -152,4 +152,4 @@ pytest
 
 ## Author
 
-*Stefanie Häberle* -  M.Sc. Informatik · aspiring Data Engineer
+*Stefanie Häberle* -  M.Sc. Informatik 
