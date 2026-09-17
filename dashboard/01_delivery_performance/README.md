@@ -22,16 +22,18 @@ transformations beyond what the pipeline already does.
 *Overview: average delivery duration, delay rate, and regional breakdown.*
 
 <details>
-<summary>Regional drill-down (coming soon)</summary>
+<summary>Regional drill-down</summary>
 
-*Screenshot not yet added.*
+![Regional drill-down - state level](screenshots/regional_drilldown_state.png)
+
+![Regional drill-down - city level](screenshots/regional_drilldown_city.png)
 
 </details>
 
 ## Opening the Dashboard
 
 Requires [Power BI Desktop](https://powerbi.microsoft.com/desktop/) (free).
-Open [`delivery_performance.pbix`](delivery_performance.pbix) directly --
+Open [`delivery_performance.pbix`](delivery_performance.pbix) directly -
 it reads from the CSV above, so run the ETL pipeline first if the file
 doesn't exist yet (see main [README](../../README.md#getting-started)).
 
