@@ -18,6 +18,14 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 
 The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. `01_delivery_performance.ipynb` currently uses a subset of these:
 
+**Note:** According to the dataset description on Kaggle, this is a realistic 
+*simulation* built from real-world logistics domain knowledge, not scraped real-world 
+operational data. This is worth keeping in mind when interpreting findings throughout 
+this project: a simulated data-generation process may not encode the kind of real-world 
+irregularities, seasonal effects, or anomalies that genuine operational data would 
+typically show, so patterns (or their absence) reflect the simulation's design rather 
+than an actual business.
+
 ### Key Operational Fields (used in `01_delivery_performance.ipynb`):
 * **IDs & Relations:** `load_id`, `route_id`, `trip_id`
 * **Event Tracking:** `event_type` *(Pickup, Delivery)*, `scheduled_datetime`, `actual_datetime`, `on_time_flag`, `detention_minutes`
@@ -43,11 +51,11 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 
 ## Key Insights
-- Average delivery time: 26.68 hours 
+- Average delivery time: 26.68 hours
 - 67.04% of deliveries were delayed
 - Average delay (delayed deliveries only): 3.00 hours
-
-- - Delays are remarkably consistent across months, year-months, and seasons, no strong seasonal pattern 
+- Delivery delays, transit duration, and weekday performance are remarkably consistent across months, seasons, years, and days of the week — no meaningful time-based pattern was found
+- Order volume and revenue are similarly stable over the 2022–2024 period, with the only notable fluctuation (lower order counts in February) explained by calendar day-count rather than seasonal demand
 
 ---
 
@@ -68,7 +76,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 │   └── processed/                        # Cleaned output from the ETL pipeline (not tracked in git)
 ├── notebooks/
 │   ├── 01_delivery_performance.ipynb     # 🟢 Finished        | Core KPIs: avg. lead time & delay rates
-│   ├── 02_temporal_patterns.ipynb        # 🟡 In Progress     | Seasonality, trends & weekday analysis
+│   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
 │   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned         | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # ⚪ Planned         | Region & facility-level performance
 │   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
@@ -125,7 +133,7 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 * 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
-  * 🟡 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
+  * 🟢 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
   * ⚪ `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
   * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
