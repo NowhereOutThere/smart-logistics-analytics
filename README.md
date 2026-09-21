@@ -8,7 +8,7 @@ A hands-on data analytics project exploring logistics data, delivery lead times,
 
 In the logistics industry, on-time delivery is a critical success factor. This project analyzes heterogeneous logistics data to identify supply chain bottlenecks, uncover temporal patterns in delays, and derive data-driven insights for process optimization.
 
-##  Data Source & Schema
+## Data Source & Schema
 
 The analysis is based on the open-source **[Logistics Operations Database](https://www.kaggle.com/datasets/yogape/logistics-operations-database/data)** available on Kaggle.
 
@@ -59,6 +59,15 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 
 ---
 
+
+## Dashboard
+
+An interactive Power BI dashboard complements the notebook analysis -
+see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
+
+
+---
+
 ## Tech Stack
 
 * **Languages:** Python 3.12.1, SQL *(planned)*
@@ -71,6 +80,12 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 ## Repository Structure
 
 ```text
+├── dashboard/
+│   ├── README.md                          # Index linking to individual dashboards
+│   └── 01_delivery_performance/
+│       ├── delivery_performance.pbix
+│       ├── README.md                      # Dashboard-specific details
+│       └── screenshots/
 ├── data/
 │   ├── raw/                              # Raw input data (not tracked in git)
 │   └── processed/                        # Cleaned output from the ETL pipeline (not tracked in git)
@@ -142,9 +157,9 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
   * ⚪ `06_driver_safety_analysis.ipynb` *(optional)* - driver performance & safety incidents
   * ⚪ `07_correlations.ipynb` - root cause analysis of shipment delays across all dimensions
 
-* ⚪ **Phase 4: BI & Dashboarding**
-  * ⚪ Build an interactive Power BI dashboard for executive summary
-
+* 🟡 **Phase 4: BI & Dashboarding**
+  * 🟢 `01_delivery_performance` dashboard -- see [dashboard index](dashboard/README.md)
+  * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
 ## Testing
@@ -154,10 +169,10 @@ The ETL pipeline is covered by automated unit tests.
 To run the tests:
 ```bash
 pytest
-```` 
+``` 
 
 ---
 
 ## Author
 
-*Stefanie Häberle* -  M.Sc. Informatik · aspiring Data Engineer
+*Stefanie Häberle* -  M.Sc. Informatik 
