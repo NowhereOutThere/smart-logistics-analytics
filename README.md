@@ -149,7 +149,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
   * 🟢 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
-  * ⚪ `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
+  * 🟡 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
   * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
 
