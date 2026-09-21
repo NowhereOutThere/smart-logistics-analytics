@@ -82,8 +82,12 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ```text
 ├── dashboard/
 │   ├── README.md                          # Index linking to individual dashboards
-│   └── 01_delivery_performance/
-│       ├── delivery_performance.pbix
+│   ├── 01_delivery_performance/
+│   │   ├── delivery_performance.pbix
+│   │   ├── README.md                      # Dashboard-specific details
+│   │   └── screenshots/
+│   └── 02_temporal_patterns/
+│       ├── temporal_patterns.pbix
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
 ├── data/
@@ -92,7 +96,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ├── notebooks/
 │   ├── 01_delivery_performance.ipynb     # 🟢 Finished        | Core KPIs: avg. lead time & delay rates
 │   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
-│   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned         | Delay/duration by truck, trailer & fuel efficiency
+│   ├── 03_fleet_equipment_analysis.ipynb # 🟡 In Progress     | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # ⚪ Planned         | Region & facility-level performance
 │   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
