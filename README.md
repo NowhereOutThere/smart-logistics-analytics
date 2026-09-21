@@ -158,7 +158,8 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * ⚪ `07_correlations.ipynb` - root cause analysis of shipment delays across all dimensions
 
 * 🟡 **Phase 4: BI & Dashboarding**
-  * 🟢 `01_delivery_performance` dashboard -- see [dashboard index](dashboard/README.md)
+  * 🟢 `01_delivery_performance` dashboard - see [dashboard index](dashboard/README.md)
+  * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
