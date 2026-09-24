@@ -16,7 +16,17 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 * **Dataset Size:** ~85,000+ operational shipment records
 * **Domain:** Supply Chain & Logistics Management
 
-The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. `01_delivery_performance.ipynb` currently uses a subset of these:
+The full schema covers 14 tables across drivers, fleet equipment, customers,
+facilities, routes, shipments, trips, fuel purchases, maintenance, delivery
+events, and safety incidents. Each notebook uses a subset of these - see
+the "Data Basis" section at the top of each notebook for the exact fields
+and tables used.
+
+Additional tables (`drivers`, `trucks`, `trailers`, `customers`,
+`fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be
+brought in progressively as further notebooks are added - see
+[Roadmap](#roadmap--development-milestones).
+
 
 **Note:** According to the dataset description on Kaggle, this is a realistic 
 *simulation* built from real-world logistics domain knowledge, not scraped real-world 
@@ -26,28 +36,11 @@ irregularities, seasonal effects, or anomalies that genuine operational data wou
 typically show, so patterns (or their absence) reflect the simulation's design rather 
 than an actual business.
 
-### Key Operational Fields (used in `01_delivery_performance.ipynb`):
-* **IDs & Relations:** `load_id`, `route_id`, `trip_id`
-* **Event Tracking:** `event_type` *(Pickup, Delivery)*, `scheduled_datetime`, `actual_datetime`, `on_time_flag`, `detention_minutes`
-* **Location:** `facility_id`, `location_city`, `location_state`
-* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
-
-### Key Operational Fields (used in `02_temporal_patterns.ipynb`):
-* **IDs & Relations:** `load_id`, `trip_id`
-* **Timestamps:** `pickup_actual_datetime`, `delivery_scheduled_datetime`, `delivery_actual_datetime`
-* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
-* **Temporal Features (derived in-notebook):** `pickup_day_of_week`, `pickup_month`, `pickup_year_month`, `pickup_season`
-
-
-Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be brought in progressively as further notebooks are added - see [Roadmap](#roadmap--development-milestones).
-
-
 
 ### Key Objectives:
 * **ETL & Data Cleaning:** Integrating, cleaning, transforming, and preparing logistics data for analysis.
 * **Exploratory Data Analysis (EDA):** Identifying Key Performance Indicators (KPIs) across regions, transport types, and customers
 * **Delay Analysis:** Pinpointing factors influencing shipment delays (progressing from descriptive to diagnostic analysis).
-
 
 
 ## Key Insights
