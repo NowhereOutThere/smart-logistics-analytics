@@ -27,6 +27,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
 PROCESSED_DATA_PATH_TEMPORAL = PROJECT_ROOT / "data" / "processed" / "clean_temporal_patterns.csv"
+PROCESSED_DATA_PATH_FLEET = PROJECT_ROOT / "data" / "processed" / "clean_fleet_analysis.csv"
 
 EVENT_COLS = [
     "event_id", "event_type", "facility_id", "scheduled_datetime",
@@ -40,10 +41,11 @@ def run_pipeline(
     raw_dir: Path = RAW_DATA_DIR, 
     output_path: Path = PROCESSED_DATA_PATH,
     include_routes: bool = True,
+    include_fleet: bool = False,
     ) -> pd.DataFrame:
     """Run the full extract -> transform -> load pipeline and return the result."""
-    raw = extract(raw_dir, include_routes=include_routes)
-    df = transform(raw, include_routes=include_routes)
+    raw = extract(raw_dir, include_routes=include_routes, include_fleet=include_fleet)
+    df = transform(raw, include_routes=include_routes, include_fleet=include_fleet)
     load(df, output_path)
     return df
 
@@ -52,11 +54,13 @@ def run_pipeline(
 # Extract
 # ---------------------------------------------------------------------------
 
-def extract(raw_dir: Path, include_routes: bool = True) -> dict[str, pd.DataFrame]:
+def extract(raw_dir: Path, include_routes: bool = True, include_fleet: bool = False) -> dict[str, pd.DataFrame]:
     """Read the raw source tables and log their shapes."""
     names = ["loads", "trips", "delivery_events"]
     if include_routes:
         names.append("routes")
+    if include_fleet:
+        names.extend(["trucks", "trailers"])
     tables = {}
     for name in names:
         path = raw_dir / f"{name}.csv"
@@ -73,11 +77,14 @@ def extract(raw_dir: Path, include_routes: bool = True) -> dict[str, pd.DataFram
 
 def transform(
         tables: dict[str, pd.DataFrame], 
-        include_routes: bool = True
+        include_routes: bool = True,
+        include_fleet: bool = False
         ) -> pd.DataFrame:
     """Merge, flatten, and enrich the raw tables into one row per load."""
     merged = merge_sources(tables, include_routes=include_routes)
     flat = flatten_events_per_load(merged)
+    if include_fleet:
+        flat = add_fleet_info(flat, tables)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
     return clean
@@ -134,6 +141,13 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     "Expected exactly one row per load_id after flattening"
     logger.info("Flattened to %s loads (from %s event rows)", len(flat), len(df))
     return flat
+
+
+def add_fleet_info(df, tables):
+    """Merge truck and trailer info onto the load-level table"""
+    df = df.merge(tables["trucks"], on="truck_id", how="left")
+    df = df.merge(tables["trailers"], on="trailer_id", how="left", suffixes=("_truck", "_trailer"))
+    return df
 
 
 def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
