@@ -3,7 +3,8 @@ import pytest
 
 # Import functions from the pipeline
 from src.delivery_pipeline import (add_performance_metrics, drop_inconsistent_timestamps, 
-                                   merge_sources, extract)
+                                   merge_sources, extract, add_fleet_info, 
+                                   flatten_events_per_load, run_pipeline)
 
 
 # ---------------------------------------------------------------------------
@@ -74,9 +75,60 @@ def test_drop_inconsistent_timestamps_removes_invalid_rows():
     assert len(result) == 1
     assert result.iloc[0]["load_id"] == 101
 
+
+# ---------------------------------------------------------------------------
+# add_fleet_info
+# ---------------------------------------------------------------------------
+
+def test_add_fleet_info_merges_truck_and_trailer_columns():
+    """Checks whether suffixes of collision-columns and fleet data are merged correctly."""
+    # 1. Arrange: Create main dummy data and tables dict with overlapping column names ('status')
+    dummy_data = pd.DataFrame({
+        "load_id": [1],
+        "truck_id": [20],
+        "trailer_id": [200],
+    })
+
+    tables = {
+        "trucks": pd.DataFrame({
+            "truck_id": [20],
+            "make": ["Volvo"],
+            "status": ["Active"],  # collision-column 1
+        }),
+        "trailers": pd.DataFrame({
+            "trailer_id": [200],
+            "trailer_type": ["Dry Van"],
+            "status": ["Maintenance"],  # collision-column 2
+        })
+    }
+
+    # 2. Act: Call pipeline-function
+    result = add_fleet_info(dummy_data, tables)
+
+    # 3. Assert: Check whether truck and trailer info was added
+    assert "make" in result.columns
+    assert "trailer_type" in result.columns
+    assert result.loc[0, "make"] == "Volvo"
+    assert result.loc[0, "trailer_type"] == "Dry Van"
+
+    # Check whether column collisions were handled with correct suffixes
+    assert "status_truck" in result.columns
+    assert "status_trailer" in result.columns
+    assert result.loc[0, "status_truck"] == "Active"
+    assert result.loc[0, "status_trailer"] == "Maintenance"
+
 # ---------------------------------------------------------------------------
 # extract
 # ---------------------------------------------------------------------------
+
+def test_extract_raises_file_not_found_when_file_missing(tmp_path):
+    """Checks that extract raises FileNotFoundError if expected CSVs do not exist."""
+    # Nur 1 Datei anlegen, 'trips.csv' und 'delivery_events.csv' fehlen
+    pd.DataFrame({"load_id": [1]}).to_csv(tmp_path / "loads.csv", index=False)
+
+    with pytest.raises(FileNotFoundError):
+        extract(tmp_path)
+
 
 
 def test_extract_includes_routes_when_flag_is_true(tmp_path):
@@ -113,6 +165,72 @@ def test_extract_excludes_routes_when_flag_is_false(tmp_path):
     assert "loads" in result
     assert "trips" in result
     assert "delivery_events" in result
+
+
+def test_extract_includes_fleet_when_flag_is_true(tmp_path):
+    """Checks that the trucks and trailers tables are loaded when include_fleet=True."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
+    pd.DataFrame({"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame({"truck_id": [20]}).to_csv(tmp_path / "trucks.csv", index=False)
+    pd.DataFrame({"trailer_id": [200]}).to_csv(tmp_path / "trailers.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_fleet=True)
+
+    # 3. Assert: Check, whether results are correct
+    assert "trucks" in result
+    assert "trailers" in result
+    assert "trips" in result
+    assert "delivery_events" in result
+
+def test_extract_excludes_fleet_when_flag_is_false(tmp_path):
+    """Checks that the trucks and trailers tables are loaded when include_fleet=False."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
+    pd.DataFrame({"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame({"truck_id": [20]}).to_csv(tmp_path / "trucks.csv", index=False)
+    pd.DataFrame({"trailer_id": [200]}).to_csv(tmp_path / "trailers.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_fleet=False)
+
+    # 3. Assert: Check, whether results are correct
+    assert "trucks" not in result
+    assert "trailers" not in result
+    assert "trips" in result
+    assert "delivery_events" in result
+
+
+# ---------------------------------------------------------------------------
+# transform
+# ---------------------------------------------------------------------------
+
+def test_flatten_events_per_load_pivots_correctly():
+    """Checks that multiple event rows are correctly flattened to 1 row per load_id."""
+    dummy_merged = pd.DataFrame({
+        "load_id_x": [1, 1],
+        "load_id_y": [1, 1],
+        "event_type": ["Pickup", "Delivery"],
+        "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+        "actual_datetime": ["2026-09-10 10:05:00", "2026-09-10 12:10:00"],
+        "facility_id": ["FAC1", "FAC2"],
+        "detention_minutes": [0, 15],
+        "on_time_flag": [True, True],
+        "location_city": ["CityA", "CityB"],
+        "location_state": ["NY", "NJ"],
+        "event_id": [10, 11]
+    })
+
+    flat = flatten_events_per_load(dummy_merged)
+
+    assert len(flat) == 1
+    assert "pickup_scheduled_datetime" in flat.columns
+    assert "delivery_scheduled_datetime" in flat.columns
 
 
 # ---------------------------------------------------------------------------
@@ -173,3 +291,31 @@ def test_merge_sources_excludes_routes_when_flag_is_false():
     assert "trip_id" in result.columns
     assert "scheduled_datetime" in result.columns
     assert result.loc[0, "trip_id"] == 100
+# ---------------------------------------------------------------------------
+# end-to-end
+# ---------------------------------------------------------------------------
+
+def test_run_pipeline_executes_end_to_end(tmp_path):
+    """Checks full pipeline execution and file creation."""
+    # Mini-Standarddaten im tmp_path anlegen
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({
+        "trip_id": [100, 100],
+        "event_id": [1, 2],
+        "event_type": ["Pickup", "Delivery"],
+        "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+        "actual_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+        "facility_id": ["F1", "F2"],
+        "detention_minutes": [0, 0],
+        "on_time_flag": [True, True],
+        "location_city": ["A", "B"],
+        "location_state": ["NY", "NJ"]
+    }).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+
+    out_file = tmp_path / "output.csv"
+    res = run_pipeline(raw_dir=tmp_path, output_path=out_file, include_routes=True)
+
+    assert out_file.exists()
+    assert len(res) == 1
