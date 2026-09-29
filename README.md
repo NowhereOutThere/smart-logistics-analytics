@@ -166,7 +166,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 4: BI & Dashboarding**
   * 🟢 `01_delivery_performance` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
-  * ⚪ `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dasboard/README.md)
+  * 🟡 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dasboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
