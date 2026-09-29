@@ -22,10 +22,8 @@ events, and safety incidents. Each notebook uses a subset of these - see
 the "Data Basis" section at the top of each notebook for the exact fields
 and tables used.
 
-Additional tables (`drivers`, `trucks`, `trailers`, `customers`,
-`fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be
-brought in progressively as further notebooks are added - see
-[Roadmap](#roadmap--development-milestones).
+Tables are brought in progressively as further notebooks are added - see
+[Roadmap](#roadmap--development-milestones) for which notebook uses what.
 
 
 **Note:** According to the dataset description on Kaggle, this is a realistic 
@@ -49,6 +47,11 @@ than an actual business.
 - Average delay (delayed deliveries only): 3.00 hours
 - Delivery delays, transit duration, and weekday performance are remarkably consistent across months, seasons, years, and days of the week — no meaningful time-based pattern was found
 - Order volume and revenue are similarly stable over the 2022–2024 period, with the only notable fluctuation (lower order counts in February) explained by calendar day-count rather than seasonal demand
+- Truck status perfectly predicts fleet utilization: all active trucks have trips, all maintenance/inactive trucks don't
+- Equipment characteristics (truck make, model year, trailer type) show no meaningful association with delay rate or delivery duration
+- Fuel efficiency (MPG) is essentially uniform noise, independent of truck or trailer characteristics
+- Diesel prices show a clear step-pattern decline at the start of each year (2022 -> 2023 -> 2024), the strongest time trend found in the project so far
+- Downtime hours differ significantly between individual trucks (p = 0.0087) - the one exception to an otherwise consistent "no equipment effect" pattern
 
 ---
 
@@ -79,8 +82,12 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   │   ├── delivery_performance.pbix
 │   │   ├── README.md                      # Dashboard-specific details
 │   │   └── screenshots/
-│   └── 02_temporal_patterns/
-│       ├── temporal_patterns.pbix
+│   ├── 02_temporal_patterns/
+│   │    ├── temporal_patterns.pbix
+│   │    ├── README.md                      # Dashboard-specific details
+│   │    └── screenshots/
+│   └── 03_fleet_equipment_analysis/
+│       ├── fleet_analysis.pbix
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
 ├── data/
@@ -89,7 +96,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ├── notebooks/
 │   ├── 01_delivery_performance.ipynb     # 🟢 Finished        | Core KPIs: avg. lead time & delay rates
 │   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
-│   ├── 03_fleet_equipment_analysis.ipynb # 🟡 In Progress     | Delay/duration by truck, trailer & fuel efficiency
+│   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished     | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # ⚪ Planned         | Region & facility-level performance
 │   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
@@ -123,8 +130,10 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
    pip install -r requirements.txt
 ```
 4. Download the raw data from the [Logistics Operations Database](https://www.kaggle.com/datasets/yogape/logistics-operations-database/data)
-   on Kaggle and place the CSV files in `data/raw/`
-   (`loads.csv`, `trips.csv`, `delivery_events.csv`, `routes.csv`).
+   on Kaggle and place all 14 CSV files in `data/raw/` Not every notebook uses every
+   table - see the "Data Basis" section at the top of each notebook for
+   which tables and fields it relies on.
+
 5. Run the ETL pipeline:
 ```bash
    python src/delivery_pipeline.py
@@ -146,7 +155,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
   * 🟢 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
-  * 🟡 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
+  * 🟢 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
   * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
 
@@ -157,6 +166,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 4: BI & Dashboarding**
   * 🟢 `01_delivery_performance` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
+  * ⚪ `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dasboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
