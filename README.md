@@ -16,7 +16,15 @@ The analysis is based on the open-source **[Logistics Operations Database](https
 * **Dataset Size:** ~85,000+ operational shipment records
 * **Domain:** Supply Chain & Logistics Management
 
-The full schema covers 14 tables across drivers, fleet equipment, customers, facilities, routes, shipments, trips, fuel purchases, maintenance, delivery events, and safety incidents. `01_delivery_performance.ipynb` currently uses a subset of these:
+The full schema covers 14 tables across drivers, fleet equipment, customers,
+facilities, routes, shipments, trips, fuel purchases, maintenance, delivery
+events, and safety incidents. Each notebook uses a subset of these - see
+the "Data Basis" section at the top of each notebook for the exact fields
+and tables used.
+
+Tables are brought in progressively as further notebooks are added - see
+[Roadmap](#roadmap--development-milestones) for which notebook uses what.
+
 
 **Note:** According to the dataset description on Kaggle, this is a realistic 
 *simulation* built from real-world logistics domain knowledge, not scraped real-world 
@@ -26,28 +34,11 @@ irregularities, seasonal effects, or anomalies that genuine operational data wou
 typically show, so patterns (or their absence) reflect the simulation's design rather 
 than an actual business.
 
-### Key Operational Fields (used in `01_delivery_performance.ipynb`):
-* **IDs & Relations:** `load_id`, `route_id`, `trip_id`
-* **Event Tracking:** `event_type` *(Pickup, Delivery)*, `scheduled_datetime`, `actual_datetime`, `on_time_flag`, `detention_minutes`
-* **Location:** `facility_id`, `location_city`, `location_state`
-* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
-
-### Key Operational Fields (used in `02_temporal_patterns.ipynb`):
-* **IDs & Relations:** `load_id`, `trip_id`
-* **Timestamps:** `pickup_actual_datetime`, `delivery_scheduled_datetime`, `delivery_actual_datetime`
-* **Derived Metrics:** `delivery_duration_hours`, `delivery_delay_hours`, `is_delayed_delivery`
-* **Temporal Features (derived in-notebook):** `pickup_day_of_week`, `pickup_month`, `pickup_year_month`, `pickup_season`
-
-
-Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases`, `maintenance_records`, `safety_incidents`, ...) will be brought in progressively as further notebooks are added - see [Roadmap](#roadmap--development-milestones).
-
-
 
 ### Key Objectives:
 * **ETL & Data Cleaning:** Integrating, cleaning, transforming, and preparing logistics data for analysis.
 * **Exploratory Data Analysis (EDA):** Identifying Key Performance Indicators (KPIs) across regions, transport types, and customers
 * **Delay Analysis:** Pinpointing factors influencing shipment delays (progressing from descriptive to diagnostic analysis).
-
 
 
 ## Key Insights
@@ -56,6 +47,11 @@ Additional tables (`drivers`, `trucks`, `trailers`, `customers`, `fuel_purchases
 - Average delay (delayed deliveries only): 3.00 hours
 - Delivery delays, transit duration, and weekday performance are remarkably consistent across months, seasons, years, and days of the week — no meaningful time-based pattern was found
 - Order volume and revenue are similarly stable over the 2022–2024 period, with the only notable fluctuation (lower order counts in February) explained by calendar day-count rather than seasonal demand
+- Truck status perfectly predicts fleet utilization: all active trucks have trips, all maintenance/inactive trucks don't
+- Equipment characteristics (truck make, model year, trailer type) show no meaningful association with delay rate or delivery duration
+- Fuel efficiency (MPG) is essentially uniform noise, independent of truck or trailer characteristics
+- Diesel prices show a clear step-pattern decline at the start of each year (2022 -> 2023 -> 2024), the strongest time trend found in the project so far
+- Downtime hours differ significantly between individual trucks (p = 0.0087) - the one exception to an otherwise consistent "no equipment effect" pattern
 
 ---
 
@@ -82,8 +78,16 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ```text
 ├── dashboard/
 │   ├── README.md                          # Index linking to individual dashboards
-│   └── 01_delivery_performance/
-│       ├── delivery_performance.pbix
+│   ├── 01_delivery_performance/
+│   │   ├── delivery_performance.pbix
+│   │   ├── README.md                      # Dashboard-specific details
+│   │   └── screenshots/
+│   ├── 02_temporal_patterns/
+│   │    ├── temporal_patterns.pbix
+│   │    ├── README.md                      # Dashboard-specific details
+│   │    └── screenshots/
+│   └── 03_fleet_equipment_analysis/
+│       ├── fleet_analysis.pbix
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
 ├── data/
@@ -92,7 +96,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ├── notebooks/
 │   ├── 01_delivery_performance.ipynb     # 🟢 Finished        | Core KPIs: avg. lead time & delay rates
 │   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
-│   ├── 03_fleet_equipment_analysis.ipynb # ⚪ Planned         | Delay/duration by truck, trailer & fuel efficiency
+│   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished     | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # ⚪ Planned         | Region & facility-level performance
 │   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
@@ -126,8 +130,10 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
    pip install -r requirements.txt
 ```
 4. Download the raw data from the [Logistics Operations Database](https://www.kaggle.com/datasets/yogape/logistics-operations-database/data)
-   on Kaggle and place the CSV files in `data/raw/`
-   (`loads.csv`, `trips.csv`, `delivery_events.csv`, `routes.csv`).
+   on Kaggle and place all 14 CSV files in `data/raw/` Not every notebook uses every
+   table - see the "Data Basis" section at the top of each notebook for
+   which tables and fields it relies on.
+
 5. Run the ETL pipeline:
 ```bash
    python src/delivery_pipeline.py
@@ -149,7 +155,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
   * 🟢 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
-  * 🟡 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
+  * 🟢 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * ⚪ `04_regional_analysis.ipynb` - region & facility-level performance
   * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
 
@@ -160,6 +166,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 4: BI & Dashboarding**
   * 🟢 `01_delivery_performance` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
+  * 🟡 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dasboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
