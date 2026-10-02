@@ -28,6 +28,7 @@ RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
 PROCESSED_DATA_PATH_TEMPORAL = PROJECT_ROOT / "data" / "processed" / "clean_temporal_patterns.csv"
 PROCESSED_DATA_PATH_FLEET = PROJECT_ROOT / "data" / "processed" / "clean_fleet_analysis.csv"
+PROCESSED_DATA_PATH_REGIONAL = PROJECT_ROOT / "data" / "processed" / "clean_regional_analysis.csv"
 
 EVENT_COLS = [
     "event_id", "event_type", "facility_id", "scheduled_datetime",
@@ -42,10 +43,11 @@ def run_pipeline(
     output_path: Path = PROCESSED_DATA_PATH,
     include_routes: bool = True,
     include_fleet: bool = False,
+    include_costs: bool = False
     ) -> pd.DataFrame:
     """Run the full extract -> transform -> load pipeline and return the result."""
-    raw = extract(raw_dir, include_routes=include_routes, include_fleet=include_fleet)
-    df = transform(raw, include_routes=include_routes, include_fleet=include_fleet)
+    raw = extract(raw_dir, include_routes=include_routes, include_fleet=include_fleet, include_costs=include_costs)
+    df = transform(raw, include_routes=include_routes, include_fleet=include_fleet, include_costs=include_costs)
     load(df, output_path)
     return df
 
@@ -54,13 +56,20 @@ def run_pipeline(
 # Extract
 # ---------------------------------------------------------------------------
 
-def extract(raw_dir: Path, include_routes: bool = True, include_fleet: bool = False) -> dict[str, pd.DataFrame]:
+def extract(
+        raw_dir: Path, 
+        include_routes: bool = True,
+        include_fleet: bool = False,
+        include_costs: bool = False
+        ) -> dict[str, pd.DataFrame]:
     """Read the raw source tables and log their shapes."""
     names = ["loads", "trips", "delivery_events"]
     if include_routes:
         names.append("routes")
     if include_fleet:
         names.extend(["trucks", "trailers"])
+    if include_costs:
+        names.append("fuel_purchases")
     tables = {}
     for name in names:
         path = raw_dir / f"{name}.csv"
@@ -78,13 +87,16 @@ def extract(raw_dir: Path, include_routes: bool = True, include_fleet: bool = Fa
 def transform(
         tables: dict[str, pd.DataFrame], 
         include_routes: bool = True,
-        include_fleet: bool = False
+        include_fleet: bool = False,
+        include_costs: bool = False
         ) -> pd.DataFrame:
     """Merge, flatten, and enrich the raw tables into one row per load."""
     merged = merge_sources(tables, include_routes=include_routes)
     flat = flatten_events_per_load(merged)
     if include_fleet:
         flat = add_fleet_info(flat, tables)
+    if include_costs:
+        flat = add_fuel_cost(flat, tables)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
     return clean
@@ -147,6 +159,31 @@ def add_fleet_info(df, tables):
     """Merge truck and trailer info onto the load-level table"""
     df = df.merge(tables["trucks"], on="truck_id", how="left")
     df = df.merge(tables["trailers"], on="trailer_id", how="left", suffixes=("_truck", "_trailer"))
+    return df
+
+def add_fuel_cost(df, tables):
+    """Merge fuel purchase info onto the load-level table"""
+    fuel = tables["fuel_purchases"]
+    fuel_per_trip = fuel.groupby("trip_id", as_index=False).agg(
+        fuel_cost = ("total_cost", "sum"),
+        fuel_gallons_purchased = ("gallons", "sum"),
+        n_fuel_purchases = ("fuel_purchase_id", "count")
+    )
+
+    new_columns = [c for c in fuel_per_trip.columns if c != "trip_id"]
+    already_existing = [c for c in new_columns if c in df.columns]
+    if already_existing:
+        raise ValueError(f"Columns already exist in the load table: {already_existing}")
+
+    
+    n_before = len(df)  
+    df = df.merge(fuel_per_trip, how="left", on="trip_id", validate="many_to_one")
+    assert len(df) == n_before, "Merge with fuel data changed the number of rows"
+
+    coverage = df["fuel_cost"].notna().mean()
+    logger.info("Fuel cost available for %.1f%% of loads", coverage * 100)
+    unmatched = fuel["trip_id"].isna() | ~fuel["trip_id"].isin(df["trip_id"])
+    logger.info("Fuel purchases without matching load: %d of %d", unmatched.sum(), len(fuel))
     return df
 
 
