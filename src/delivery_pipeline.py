@@ -96,7 +96,7 @@ def transform(
     if include_fleet:
         flat = add_fleet_info(flat, tables)
     if include_costs:
-        flat = add_fuel_cost(flat, tables)
+        flat = add_fuel_costs(flat, tables)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
     return clean
@@ -161,7 +161,8 @@ def add_fleet_info(df, tables):
     df = df.merge(tables["trailers"], on="trailer_id", how="left", suffixes=("_truck", "_trailer"))
     return df
 
-def add_fuel_cost(df, tables):
+
+def add_fuel_costs(df, tables):
     """Merge fuel purchase info onto the load-level table"""
     fuel = tables["fuel_purchases"]
     fuel_per_trip = fuel.groupby("trip_id", as_index=False).agg(
@@ -174,9 +175,8 @@ def add_fuel_cost(df, tables):
     already_existing = [c for c in new_columns if c in df.columns]
     if already_existing:
         raise ValueError(f"Columns already exist in the load table: {already_existing}")
-
     
-    n_before = len(df)  
+    n_before = len(df)
     df = df.merge(fuel_per_trip, how="left", on="trip_id", validate="many_to_one")
     assert len(df) == n_before, "Merge with fuel data changed the number of rows"
 
