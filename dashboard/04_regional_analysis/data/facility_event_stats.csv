@@ -1,0 +1,101 @@
+facility_id,event_type,n_events,on_time_events,total_detention,facility_name,facility_type,city,state,latitude,longitude,label
+FAC00001,Delivery,1624,769,173260,Houston Distribution Center,Cross-Dock,Houston,TX,29.7604,-95.3698,Houston 01
+FAC00001,Pickup,1637,1133,122382,Houston Distribution Center,Cross-Dock,Houston,TX,29.7604,-95.3698,Houston 01
+FAC00002,Delivery,1718,791,184272,Kansas City Hub,Cross-Dock,Kansas City,MO,39.0997,-94.5786,Kansas City 02
+FAC00002,Pickup,1694,1109,130490,Kansas City Hub,Cross-Dock,Kansas City,MO,39.0997,-94.5786,Kansas City 02
+FAC00003,Delivery,1728,802,182384,Charlotte Distribution Center,Distribution Center,Charlotte,NC,35.2271,-80.8431,Charlotte 03
+FAC00003,Pickup,1776,1209,134112,Charlotte Distribution Center,Distribution Center,Charlotte,NC,35.2271,-80.8431,Charlotte 03
+FAC00004,Delivery,1653,720,181521,Chicago Distribution Center,Distribution Center,Chicago,IL,41.8781,-87.6298,Chicago 04
+FAC00004,Pickup,1705,1148,129987,Chicago Distribution Center,Distribution Center,Chicago,IL,41.8781,-87.6298,Chicago 04
+FAC00005,Delivery,1672,766,175021,Indianapolis Hub,Distribution Center,Indianapolis,IN,39.7684,-86.1581,Indianapolis 05
+FAC00005,Pickup,1707,1163,133099,Indianapolis Hub,Distribution Center,Indianapolis,IN,39.7684,-86.1581,Indianapolis 05
+FAC00006,Delivery,1678,758,181145,Atlanta Warehouse,Distribution Center,Atlanta,GA,33.749,-84.388,Atlanta 06
+FAC00006,Pickup,1644,1096,125824,Atlanta Warehouse,Distribution Center,Atlanta,GA,33.749,-84.388,Atlanta 06
+FAC00007,Delivery,1653,762,178482,Detroit Warehouse,Terminal,Detroit,MI,42.3314,-83.0458,Detroit 07
+FAC00007,Pickup,1725,1160,133400,Detroit Warehouse,Terminal,Detroit,MI,42.3314,-83.0458,Detroit 07
+FAC00008,Delivery,1705,796,181530,Philadelphia Hub,Cross-Dock,Philadelphia,PA,39.9526,-75.1652,Philadelphia 08
+FAC00008,Pickup,1708,1161,133206,Philadelphia Hub,Cross-Dock,Philadelphia,PA,39.9526,-75.1652,Philadelphia 08
+FAC00009,Delivery,1684,736,180047,Nashville Distribution Center,Terminal,Nashville,TN,36.1627,-86.7816,Nashville 09
+FAC00009,Pickup,1697,1105,132654,Nashville Distribution Center,Terminal,Nashville,TN,36.1627,-86.7816,Nashville 09
+FAC00010,Delivery,1784,822,189345,Indianapolis Distribution Center,Warehouse,Indianapolis,IN,39.7684,-86.1581,Indianapolis 10
+FAC00010,Pickup,1729,1157,132230,Indianapolis Distribution Center,Warehouse,Indianapolis,IN,39.7684,-86.1581,Indianapolis 10
+FAC00011,Delivery,1722,731,182138,Nashville Distribution Center,Cross-Dock,Nashville,TN,36.1627,-86.7816,Nashville 11
+FAC00011,Pickup,1679,1111,128316,Nashville Distribution Center,Cross-Dock,Nashville,TN,36.1627,-86.7816,Nashville 11
+FAC00012,Delivery,1659,724,181015,Atlanta Distribution Center,Distribution Center,Atlanta,GA,33.749,-84.388,Atlanta 12
+FAC00012,Pickup,1604,1020,121660,Atlanta Distribution Center,Distribution Center,Atlanta,GA,33.749,-84.388,Atlanta 12
+FAC00013,Delivery,1708,739,179598,Nashville Distribution Center,Distribution Center,Nashville,TN,36.1627,-86.7816,Nashville 13
+FAC00013,Pickup,1680,1154,129447,Nashville Distribution Center,Distribution Center,Nashville,TN,36.1627,-86.7816,Nashville 13
+FAC00014,Delivery,1722,755,187126,Indianapolis Warehouse,Distribution Center,Indianapolis,IN,39.7684,-86.1581,Indianapolis 14
+FAC00014,Pickup,1664,1123,129777,Indianapolis Warehouse,Distribution Center,Indianapolis,IN,39.7684,-86.1581,Indianapolis 14
+FAC00015,Delivery,1738,767,189710,Phoenix Distribution Center,Terminal,Phoenix,AZ,33.4484,-112.074,Phoenix 15
+FAC00015,Pickup,1636,1080,126617,Phoenix Distribution Center,Terminal,Phoenix,AZ,33.4484,-112.074,Phoenix 15
+FAC00016,Delivery,1673,735,176191,Detroit Hub,Distribution Center,Detroit,MI,42.3314,-83.0458,Detroit 16
+FAC00016,Pickup,1734,1165,132684,Detroit Hub,Distribution Center,Detroit,MI,42.3314,-83.0458,Detroit 16
+FAC00017,Delivery,1696,769,179777,Omaha Distribution Center,Cross-Dock,Omaha,NE,41.2565,-95.9345,Omaha 17
+FAC00017,Pickup,1729,1149,136996,Omaha Distribution Center,Cross-Dock,Omaha,NE,41.2565,-95.9345,Omaha 17
+FAC00018,Delivery,1664,719,176886,Dallas Distribution Center,Cross-Dock,Dallas,TX,32.7767,-96.797,Dallas 18
+FAC00018,Pickup,1710,1110,127868,Dallas Distribution Center,Cross-Dock,Dallas,TX,32.7767,-96.797,Dallas 18
+FAC00019,Delivery,1674,740,177899,Houston Warehouse,Warehouse,Houston,TX,29.7604,-95.3698,Houston 19
+FAC00019,Pickup,1675,1142,128048,Houston Warehouse,Warehouse,Houston,TX,29.7604,-95.3698,Houston 19
+FAC00020,Delivery,1638,753,178266,Nashville Terminal,Cross-Dock,Nashville,TN,36.1627,-86.7816,Nashville 20
+FAC00020,Pickup,1815,1235,137723,Nashville Terminal,Cross-Dock,Nashville,TN,36.1627,-86.7816,Nashville 20
+FAC00021,Delivery,1549,721,164161,Las Vegas Terminal,Distribution Center,Las Vegas,NV,36.1699,-115.1398,Las Vegas 21
+FAC00021,Pickup,1697,1132,128149,Las Vegas Terminal,Distribution Center,Las Vegas,NV,36.1699,-115.1398,Las Vegas 21
+FAC00022,Delivery,1669,788,177597,New York Distribution Center,Cross-Dock,New York,NY,40.7128,-74.006,New York 22
+FAC00022,Pickup,1735,1178,130814,New York Distribution Center,Cross-Dock,New York,NY,40.7128,-74.006,New York 22
+FAC00023,Delivery,1642,726,178705,Portland Warehouse,Cross-Dock,Portland,OR,45.5152,-122.6784,Portland 23
+FAC00023,Pickup,1624,1085,123115,Portland Warehouse,Cross-Dock,Portland,OR,45.5152,-122.6784,Portland 23
+FAC00024,Delivery,1683,735,184141,Denver Distribution Center,Terminal,Denver,CO,39.7392,-104.9903,Denver 24
+FAC00024,Pickup,1708,1141,129659,Denver Distribution Center,Terminal,Denver,CO,39.7392,-104.9903,Denver 24
+FAC00025,Delivery,1739,779,182920,Oklahoma City Terminal,Cross-Dock,Oklahoma City,OK,35.4676,-97.5164,Oklahoma City 25
+FAC00025,Pickup,1703,1139,129049,Oklahoma City Terminal,Cross-Dock,Oklahoma City,OK,35.4676,-97.5164,Oklahoma City 25
+FAC00026,Delivery,1713,772,180336,Atlanta Warehouse,Warehouse,Atlanta,GA,33.749,-84.388,Atlanta 26
+FAC00026,Pickup,1688,1140,127269,Atlanta Warehouse,Warehouse,Atlanta,GA,33.749,-84.388,Atlanta 26
+FAC00027,Delivery,1736,833,184650,Philadelphia Hub,Cross-Dock,Philadelphia,PA,39.9526,-75.1652,Philadelphia 27
+FAC00027,Pickup,1678,1083,129417,Philadelphia Hub,Cross-Dock,Philadelphia,PA,39.9526,-75.1652,Philadelphia 27
+FAC00028,Delivery,1761,775,188286,Las Vegas Hub,Terminal,Las Vegas,NV,36.1699,-115.1398,Las Vegas 28
+FAC00028,Pickup,1796,1204,133712,Las Vegas Hub,Terminal,Las Vegas,NV,36.1699,-115.1398,Las Vegas 28
+FAC00029,Delivery,1674,737,175393,Miami Warehouse,Terminal,Miami,FL,25.7617,-80.1918,Miami 29
+FAC00029,Pickup,1697,1122,126561,Miami Warehouse,Terminal,Miami,FL,25.7617,-80.1918,Miami 29
+FAC00030,Delivery,1700,737,178173,Detroit Hub,Cross-Dock,Detroit,MI,42.3314,-83.0458,Detroit 30
+FAC00030,Pickup,1673,1101,127031,Detroit Hub,Cross-Dock,Detroit,MI,42.3314,-83.0458,Detroit 30
+FAC00031,Delivery,1724,770,181720,Los Angeles Warehouse,Cross-Dock,Los Angeles,CA,34.0522,-118.2437,Los Angeles 31
+FAC00031,Pickup,1771,1190,135078,Los Angeles Warehouse,Cross-Dock,Los Angeles,CA,34.0522,-118.2437,Los Angeles 31
+FAC00032,Delivery,1685,740,183647,Miami Distribution Center,Terminal,Miami,FL,25.7617,-80.1918,Miami 32
+FAC00032,Pickup,1679,1137,127973,Miami Distribution Center,Terminal,Miami,FL,25.7617,-80.1918,Miami 32
+FAC00033,Delivery,1667,733,171881,Miami Distribution Center,Distribution Center,Miami,FL,25.7617,-80.1918,Miami 33
+FAC00033,Pickup,1793,1173,139258,Miami Distribution Center,Distribution Center,Miami,FL,25.7617,-80.1918,Miami 33
+FAC00034,Delivery,1721,721,176022,Charlotte Terminal,Cross-Dock,Charlotte,NC,35.2271,-80.8431,Charlotte 34
+FAC00034,Pickup,1671,1092,124866,Charlotte Terminal,Cross-Dock,Charlotte,NC,35.2271,-80.8431,Charlotte 34
+FAC00035,Delivery,1762,754,189689,Phoenix Distribution Center,Terminal,Phoenix,AZ,33.4484,-112.074,Phoenix 35
+FAC00035,Pickup,1668,1119,127363,Phoenix Distribution Center,Terminal,Phoenix,AZ,33.4484,-112.074,Phoenix 35
+FAC00036,Delivery,1705,745,173530,Omaha Distribution Center,Cross-Dock,Omaha,NE,41.2565,-95.9345,Omaha 36
+FAC00036,Pickup,1673,1116,131006,Omaha Distribution Center,Cross-Dock,Omaha,NE,41.2565,-95.9345,Omaha 36
+FAC00037,Delivery,1693,735,180173,Portland Terminal,Terminal,Portland,OR,45.5152,-122.6784,Portland 37
+FAC00037,Pickup,1696,1167,129612,Portland Terminal,Terminal,Portland,OR,45.5152,-122.6784,Portland 37
+FAC00038,Delivery,1675,779,181289,Salt Lake City Warehouse,Distribution Center,Salt Lake City,UT,40.7608,-111.891,Salt Lake City 38
+FAC00038,Pickup,1658,1110,126625,Salt Lake City Warehouse,Distribution Center,Salt Lake City,UT,40.7608,-111.891,Salt Lake City 38
+FAC00039,Delivery,1691,788,183023,Charlotte Distribution Center,Warehouse,Charlotte,NC,35.2271,-80.8431,Charlotte 39
+FAC00039,Pickup,1763,1174,133853,Charlotte Distribution Center,Warehouse,Charlotte,NC,35.2271,-80.8431,Charlotte 39
+FAC00040,Delivery,1711,768,186008,Nashville Distribution Center,Cross-Dock,Nashville,TN,36.1627,-86.7816,Nashville 40
+FAC00040,Pickup,1661,1141,130230,Nashville Distribution Center,Cross-Dock,Nashville,TN,36.1627,-86.7816,Nashville 40
+FAC00041,Delivery,1724,789,183722,Milwaukee Distribution Center,Cross-Dock,Milwaukee,WI,43.0389,-87.9065,Milwaukee 41
+FAC00041,Pickup,1692,1091,128787,Milwaukee Distribution Center,Cross-Dock,Milwaukee,WI,43.0389,-87.9065,Milwaukee 41
+FAC00042,Delivery,1715,807,183266,Salt Lake City Terminal,Warehouse,Salt Lake City,UT,40.7608,-111.891,Salt Lake City 42
+FAC00042,Pickup,1689,1121,132903,Salt Lake City Terminal,Warehouse,Salt Lake City,UT,40.7608,-111.891,Salt Lake City 42
+FAC00043,Delivery,1733,750,185384,Atlanta Warehouse,Warehouse,Atlanta,GA,33.749,-84.388,Atlanta 43
+FAC00043,Pickup,1769,1155,134678,Atlanta Warehouse,Warehouse,Atlanta,GA,33.749,-84.388,Atlanta 43
+FAC00044,Delivery,1728,778,182394,Las Vegas Terminal,Cross-Dock,Las Vegas,NV,36.1699,-115.1398,Las Vegas 44
+FAC00044,Pickup,1753,1196,134871,Las Vegas Terminal,Cross-Dock,Las Vegas,NV,36.1699,-115.1398,Las Vegas 44
+FAC00045,Delivery,1688,753,180410,Houston Hub,Distribution Center,Houston,TX,29.7604,-95.3698,Houston 45
+FAC00045,Pickup,1674,1115,127914,Houston Hub,Distribution Center,Houston,TX,29.7604,-95.3698,Houston 45
+FAC00046,Delivery,1765,796,189981,Los Angeles Distribution Center,Cross-Dock,Los Angeles,CA,34.0522,-118.2437,Los Angeles 46
+FAC00046,Pickup,1649,1067,122999,Los Angeles Distribution Center,Cross-Dock,Los Angeles,CA,34.0522,-118.2437,Los Angeles 46
+FAC00047,Delivery,1744,786,182057,Milwaukee Hub,Warehouse,Milwaukee,WI,43.0389,-87.9065,Milwaukee 47
+FAC00047,Pickup,1706,1157,131464,Milwaukee Hub,Warehouse,Milwaukee,WI,43.0389,-87.9065,Milwaukee 47
+FAC00048,Delivery,1721,724,187341,Indianapolis Warehouse,Terminal,Indianapolis,IN,39.7684,-86.1581,Indianapolis 48
+FAC00048,Pickup,1639,1062,127659,Indianapolis Warehouse,Terminal,Indianapolis,IN,39.7684,-86.1581,Indianapolis 48
+FAC00049,Delivery,1663,716,178419,Dallas Distribution Center,Distribution Center,Dallas,TX,32.7767,-96.797,Dallas 49
+FAC00049,Pickup,1687,1108,126300,Dallas Distribution Center,Distribution Center,Dallas,TX,32.7767,-96.797,Dallas 49
+FAC00050,Delivery,1750,793,184120,Detroit Hub,Cross-Dock,Detroit,MI,42.3314,-83.0458,Detroit 50
+FAC00050,Pickup,1686,1119,129793,Detroit Hub,Cross-Dock,Detroit,MI,42.3314,-83.0458,Detroit 50
