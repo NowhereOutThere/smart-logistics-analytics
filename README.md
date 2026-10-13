@@ -75,6 +75,9 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * **Libraries:** Pandas, Matplotlib, Seaborn, Pytest, NumPy, SciPy
 * **Tools:** Jupyter Notebooks, Git / GitHub, Power BI
 
+## Code Quality & Standards
+* Formatted with **Ruff** for clean and PEP8-compliant Python code.
+* Enforced strict unit testing using **Pytest**.
 ---
 
 ## Repository Structure
