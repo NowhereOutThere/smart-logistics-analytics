@@ -1,6 +1,6 @@
 # Smart Logistics Analytics & Delivery Performance
 
-A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python**, **Pandas**, with **SQL** and **Power BI** planned for a later phase.
+A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python** and **Pandas**, with interactive **Power BI** dashboards; **SQL** planned for a later phase.
 
 ---
 
@@ -52,7 +52,12 @@ than an actual business.
 - Fuel efficiency (MPG) is essentially uniform noise, independent of truck or trailer characteristics
 - Diesel prices show a clear step-pattern decline at the start of each year (2022 -> 2023 -> 2024), the strongest time trend found in the project so far
 - Downtime hours differ significantly between individual trucks (p = 0.0087) - the one exception to an otherwise consistent "no equipment effect" pattern
-
+- Facilities differ slightly but more than chance would explain in on-time rate (53.2–58.3 %, permutation test p = 0.0004); detention does not differ (p = 0.63)
+- Pickups are on time in 66.7 % of events, deliveries in 44.7 %; deliveries also wait 30 min longer on average
+- Distance explains 94 % of the variance in delivery duration; regional differences (11.9–40.4 h) almost disappear after adjusting for distance, only NY and PA remain slightly above expectation
+- All routes are profitable after the estimated fuel cost (margin per mile $1.05–$2.34); the ranking follows the route's base rate, not the distance (Columbus - Portland highest, Charlotte - Denver lowest)
+- Purchased fuel per load is almost constant (about $1,240) and unrelated to the distance, so fuel cost per mile was estimated from the fuel consumption instead
+- The location fields of delivery events match the route's origin and destination, not the assigned facility (match rate 3.45 % = chance level)
 ---
 
 
@@ -67,10 +72,14 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ## Tech Stack
 
 * **Languages:** Python 3.12.1, SQL *(planned)*
-* **Libraries:** Pandas, Matplotlib, Seaborn, Pytest
-* **Tools:** Jupyter Notebooks, Git / GitHub
-* *(Planned: Power BI for interactive dashboards)*
+* **Libraries:** Pandas, Matplotlib, Seaborn, Pytest, NumPy, SciPy
+* **Tools:** Jupyter Notebooks, Git / GitHub, Power BI
 
+
+## Code Quality & Standards
+
+* Formatted with **Ruff** for clean and PEP8-compliant Python code.
+* Covered by unit tests using **Pytest**.
 ---
 
 ## Repository Structure
@@ -84,10 +93,15 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   │   └── screenshots/
 │   ├── 02_temporal_patterns/
 │   │    ├── temporal_patterns.pbix
-│   │    ├── README.md                      # Dashboard-specific details
+│   │    ├── README.md                     # Dashboard-specific details
 │   │    └── screenshots/
-│   └── 03_fleet_equipment_analysis/
-│       ├── fleet_analysis.pbix
+│   ├── 03_fleet_equipment_analysis/
+│   │   ├── fleet_analysis.pbix
+│   │   ├── README.md                      # Dashboard-specific details
+│   │   └── screenshots/
+│   └── 04_regional_analysis/              
+│       ├── data                           # aggregated CSV exports
+│       ├── regional_analysis.pbix
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
 ├── data/
@@ -96,8 +110,8 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ├── notebooks/
 │   ├── 01_delivery_performance.ipynb     # 🟢 Finished        | Core KPIs: avg. lead time & delay rates
 │   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
-│   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished     | Delay/duration by truck, trailer & fuel efficiency
-│   ├── 04_regional_analysis.ipynb        # ⚪ Planned         | Region & facility-level performance
+│   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished        | Delay/duration by truck, trailer & fuel efficiency
+│   ├── 04_regional_analysis.ipynb        # 🟢 Finished        | Facility, region & route profitability analysis
 │   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
 │   └── 07_correlations.ipynb             # ⚪ Planned         | Diagnostic analysis: key drivers of delays
@@ -121,9 +135,9 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ```
 2. (Optional but recommended) Create a virtual environment:
 ```bash
-   python -m venv venv
-   venv\Scripts\activate        # Windows
-   source venv/bin/activate     # macOS/Linux
+   python -m venv .venv
+   .venv\Scripts\activate        # Windows
+   source .venv/bin/activate     # macOS/Linux
 ```
 3. Install dependencies:
 ```bash
@@ -156,7 +170,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
   * 🟢 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
   * 🟢 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
-  * 🟡 `04_regional_analysis.ipynb` - region & facility-level performance
+  * 🟢 `04_regional_analysis.ipynb` - facility, region & route profitability analysis
   * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
 
 * ⚪ **Phase 3: Diagnostic Analysis & Modeling**
@@ -166,7 +180,8 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * 🟡 **Phase 4: BI & Dashboarding**
   * 🟢 `01_delivery_performance` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
-  * 🟡 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dasboard/README.md)
+  * 🟢 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dashboard/README.md)
+  * 🟢 `04_regional_analysis` dashboard - see [dashboard index](dashboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
