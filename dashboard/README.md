@@ -9,4 +9,5 @@ and a short README with details.
 | [01_delivery_performance](01_delivery_performance/README.md) | [`01_delivery_performance.ipynb`](../notebooks/01_delivery_performance.ipynb) | 🟢  |
 | [02_temporal_patterns](02_temporal_patterns/README.md)       | [`02_temporal_patterns.ipynb`](../notebooks/02_temporal_patterns.ipynb)       | 🟢  |
 | [03_fleet_equipment_analysis](03_fleet_equipment_analysis/README.md) | [`03_fleet_analysis.ipynb`](../notebooks/03_fleet_equipment_analysis.ipynb) | 🟢 |
-  
+| [04_regional_analysis](04_regional_analysis/README.md) | [`04_regional_analysis.ipynb`](../notebooks/04_regional_analysis.ipynb) | 🟢 |
+    
