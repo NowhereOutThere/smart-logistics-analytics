@@ -1,6 +1,6 @@
 # Smart Logistics Analytics & Delivery Performance
 
-A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python**, **Pandas**, with interactive **Power BI** dashboards and **SQL** planned for a later phase.
+A hands-on data analytics project exploring logistics data, delivery lead times, and delay root causes using **Python** and **Pandas**, with interactive **Power BI** dashboards; **SQL** planned for a later phase.
 
 ---
 
@@ -52,7 +52,7 @@ than an actual business.
 - Fuel efficiency (MPG) is essentially uniform noise, independent of truck or trailer characteristics
 - Diesel prices show a clear step-pattern decline at the start of each year (2022 -> 2023 -> 2024), the strongest time trend found in the project so far
 - Downtime hours differ significantly between individual trucks (p = 0.0087) - the one exception to an otherwise consistent "no equipment effect" pattern
-- Facilities differ slightly but not randomly in on-time rate (53.2–58.3 %, permutation test p = 0.0004), but not in detention (p = 0.63)
+- Facilities differ slightly but more than chance would explain in on-time rate (53.2–58.3 %, permutation test p = 0.0004); detention does not differ (p = 0.63)
 - Pickups are on time in 66.7 % of events, deliveries in 44.7 %; deliveries also wait 30 min longer on average
 - Distance explains 94 % of the variance in delivery duration; regional differences (11.9–40.4 h) almost disappear after adjusting for distance, only NY and PA remain slightly above expectation
 - All routes are profitable after the estimated fuel cost (margin per mile $1.05–$2.34); the ranking follows the route's base rate, not the distance (Columbus - Portland highest, Charlotte - Denver lowest)
@@ -75,9 +75,11 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 * **Libraries:** Pandas, Matplotlib, Seaborn, Pytest, NumPy, SciPy
 * **Tools:** Jupyter Notebooks, Git / GitHub, Power BI
 
+
 ## Code Quality & Standards
+
 * Formatted with **Ruff** for clean and PEP8-compliant Python code.
-* Enforced strict unit testing using **Pytest**.
+* Covered by unit tests using **Pytest**.
 ---
 
 ## Repository Structure
@@ -98,6 +100,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   │   ├── README.md                      # Dashboard-specific details
 │   │   └── screenshots/
 │   └── 04_regional_analysis/              # in progress
+│       ├── data                           # aggregated CSV exports
 │       ├── regional_analysis.pbix
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
@@ -132,7 +135,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 ```
 2. (Optional but recommended) Create a virtual environment:
 ```bash
-   python -m .venv .venv
+   python -m venv .venv
    .venv\Scripts\activate        # Windows
    source .venv/bin/activate     # macOS/Linux
 ```
@@ -178,7 +181,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * 🟢 `01_delivery_performance` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dashboard/README.md)
-  * 🟡 `04_regional_analsyis` dashboard - see [dashboard index](dashboard/README.md)
+  * 🟡 `04_regional_analysis` dashboard - see [dashboard index](dashboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
