@@ -2,23 +2,33 @@ import pandas as pd
 import pytest
 
 # Import functions from the pipeline
-from src.delivery_pipeline import (add_performance_metrics, drop_inconsistent_timestamps, 
-                                   merge_sources, extract, add_fleet_info, add_fuel_costs,
-                                   flatten_events_per_load, run_pipeline)
-
+from src.delivery_pipeline import (
+    add_customer_info,
+    add_fleet_info,
+    add_fuel_costs,
+    add_performance_metrics,
+    drop_inconsistent_timestamps,
+    extract,
+    flatten_events_per_load,
+    merge_sources,
+    run_pipeline,
+)
 
 # ---------------------------------------------------------------------------
 # add_performance_metrics
 # ---------------------------------------------------------------------------
 
+
 def test_add_performance_metrics_calculates_correctly():
     """Checks whether duration and delay (in hours) are calculated correctly."""
     # 1. Arrange: Prepare test data (1 delivery, 2-hour duration, 1-hour delay)
-    dummy_data = pd.DataFrame({
-        "pickup_actual_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
-        "delivery_scheduled_datetime": [pd.Timestamp("2026-09-10 11:00:00")],
-        "delivery_actual_datetime": [pd.Timestamp("2026-09-10 12:00:00")],
-    })
+    dummy_data = pd.DataFrame(
+        {
+            "pickup_actual_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
+            "delivery_scheduled_datetime": [pd.Timestamp("2026-09-10 11:00:00")],
+            "delivery_actual_datetime": [pd.Timestamp("2026-09-10 12:00:00")],
+        }
+    )
 
     # 2. Act: Call pipeline-function
     result = add_performance_metrics(dummy_data)
@@ -33,11 +43,13 @@ def test_add_performance_metrics_handles_on_time():
     """Checks, whether punctual deliveries have is_delayed_delivery = False."""
     # 1. Arrange: A pickup datetime (actual) and two delivery datetimes (scheduled and
     # actual)
-    dummy_data = pd.DataFrame({
-        "pickup_actual_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
-        "delivery_scheduled_datetime": [pd.Timestamp("2026-09-10 12:00:00")],
-        "delivery_actual_datetime": [pd.Timestamp("2026-09-10 11:30:00")],
-    })
+    dummy_data = pd.DataFrame(
+        {
+            "pickup_actual_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
+            "delivery_scheduled_datetime": [pd.Timestamp("2026-09-10 12:00:00")],
+            "delivery_actual_datetime": [pd.Timestamp("2026-09-10 11:30:00")],
+        }
+    )
 
     # 2. Act: Call pipeline-function
     result = add_performance_metrics(dummy_data)
@@ -52,20 +64,23 @@ def test_add_performance_metrics_handles_on_time():
 # drop_inconsistent_timestamps
 # ---------------------------------------------------------------------------
 
+
 def test_drop_inconsistent_timestamps_removes_invalid_rows():
     """Checks whether delivery before pickup is filtered correctly."""
     # 1. Arrange: A valid row (row 0) and an invalid row (row 1)
-    dummy_data = pd.DataFrame({
-        "load_id": [101, 102],
-        "pickup_actual_datetime": [
-            pd.Timestamp("2026-09-10 10:00:00"),
-            pd.Timestamp("2026-09-10 10:00:00"),
-        ],
-        "delivery_actual_datetime": [
-            pd.Timestamp("2026-09-10 12:00:00"),  # Valid: after pickup
-            pd.Timestamp("2026-09-10 08:00:00"),  # Invalid: before pickup!
-        ],
-    })
+    dummy_data = pd.DataFrame(
+        {
+            "load_id": [101, 102],
+            "pickup_actual_datetime": [
+                pd.Timestamp("2026-09-10 10:00:00"),
+                pd.Timestamp("2026-09-10 10:00:00"),
+            ],
+            "delivery_actual_datetime": [
+                pd.Timestamp("2026-09-10 12:00:00"),  # Valid: after pickup
+                pd.Timestamp("2026-09-10 08:00:00"),  # Invalid: before pickup!
+            ],
+        }
+    )
 
     # 2. Act: Call pipeline-function
     result = drop_inconsistent_timestamps(dummy_data)
@@ -79,26 +94,33 @@ def test_drop_inconsistent_timestamps_removes_invalid_rows():
 # add_fleet_info
 # ---------------------------------------------------------------------------
 
+
 def test_add_fleet_info_merges_truck_and_trailer_columns():
     """Checks whether suffixes of collision-columns and fleet data are merged correctly."""
     # 1. Arrange: Create main dummy data and tables dict with overlapping column names ('status')
-    dummy_data = pd.DataFrame({
-        "load_id": [1],
-        "truck_id": [20],
-        "trailer_id": [200],
-    })
+    dummy_data = pd.DataFrame(
+        {
+            "load_id": [1],
+            "truck_id": [20],
+            "trailer_id": [200],
+        }
+    )
 
     tables = {
-        "trucks": pd.DataFrame({
-            "truck_id": [20],
-            "make": ["Volvo"],
-            "status": ["Active"],  # collision-column 1
-        }),
-        "trailers": pd.DataFrame({
-            "trailer_id": [200],
-            "trailer_type": ["Dry Van"],
-            "status": ["Maintenance"],  # collision-column 2
-        })
+        "trucks": pd.DataFrame(
+            {
+                "truck_id": [20],
+                "make": ["Volvo"],
+                "status": ["Active"],  # collision-column 1
+            }
+        ),
+        "trailers": pd.DataFrame(
+            {
+                "trailer_id": [200],
+                "trailer_type": ["Dry Van"],
+                "status": ["Maintenance"],  # collision-column 2
+            }
+        ),
     }
 
     # 2. Act: Call pipeline-function
@@ -121,22 +143,27 @@ def test_add_fleet_info_merges_truck_and_trailer_columns():
 # add_fuel_costs
 # ---------------------------------------------------------------------------
 
+
 def test_add_fuel_costs_sums_purchases_per_trip():
     """Checks that multiple purchases per trip are summed into one row per load."""
     # 1. Arrange: three loads; purchases exist only for trip 11 (two) and trip 22 (one)
     # and an extra one for trip 99 that has no load
-    df = pd.DataFrame({
-        "load_id": [1, 2, 3],
-        "trip_id": [11, 22, 33]
-    })
+    df = pd.DataFrame({"load_id": [1, 2, 3], "trip_id": [11, 22, 33]})
 
     tables = {
-        "fuel_purchases": pd.DataFrame({
-            "fuel_purchase_id": [111, 222, 333, 444],
-            "trip_id": [11, 11, 22, 99], # no entry for trip_id 33, trip 99 has no load
-            "total_cost": [100.0, 50.0, 80.0, 60.0],
-            "gallons": [30, 15, 25, 20]
-        })
+        "fuel_purchases": pd.DataFrame(
+            {
+                "fuel_purchase_id": [111, 222, 333, 444],
+                "trip_id": [
+                    11,
+                    11,
+                    22,
+                    99,
+                ],  # no entry for trip_id 33, trip 99 has no load
+                "total_cost": [100.0, 50.0, 80.0, 60.0],
+                "gallons": [30, 15, 25, 20],
+            }
+        )
     }
 
     # 2. Act: Call pipeline-function
@@ -153,24 +180,23 @@ def test_add_fuel_costs_sums_purchases_per_trip():
 def test_add_fuel_costs_leaves_nan_for_loads_without_purchases():
     """Checks that loads without any fuel purchase get NaN (not 0) in the fuel columns."""
     # 1. Arrange: three loads; purchases exist only for trip 11 (two) and trip 22 (one)
-    df = pd.DataFrame({
-        "load_id": [1, 2, 3],
-        "trip_id": [11, 22, 33]
-    })
+    df = pd.DataFrame({"load_id": [1, 2, 3], "trip_id": [11, 22, 33]})
 
     tables = {
-        "fuel_purchases": pd.DataFrame({
-            "fuel_purchase_id": [111, 222, 333],
-            "trip_id": [11, 11, 22], # no entry for trip_id 33
-            "total_cost": [100.0, 50.0, 80.0],
-            "gallons": [30, 15, 25]
-        })
+        "fuel_purchases": pd.DataFrame(
+            {
+                "fuel_purchase_id": [111, 222, 333],
+                "trip_id": [11, 11, 22],  # no entry for trip_id 33
+                "total_cost": [100.0, 50.0, 80.0],
+                "gallons": [30, 15, 25],
+            }
+        )
     }
 
     # 2. Act: Call pipeline-function
     result = add_fuel_costs(df, tables)
 
-    # 3. Assert: trip 33 has no purchase -> all fuel columns NaN, because 0 would suggest 
+    # 3. Assert: trip 33 has no purchase -> all fuel columns NaN, because 0 would suggest
     # free fuel and inflate margins later
     by_trip = result.set_index("trip_id")
     assert pd.isna(by_trip.loc[33, "fuel_cost"])
@@ -181,19 +207,23 @@ def test_add_fuel_costs_leaves_nan_for_loads_without_purchases():
 def test_add_fuel_costs_raises_if_columns_already_exist():
     """Checks that a ValueError is raised if the load table already has a fuel_cost column."""
     # 1. Arrange: load table that already contains 'fuel_cost'
-    df = pd.DataFrame({
+    df = pd.DataFrame(
+        {
             "load_id": [1, 2, 3],
             "trip_id": [11, 22, 33],
-            "fuel_cost": [111.0, 222.0, 333.0]
-        })
+            "fuel_cost": [111.0, 222.0, 333.0],
+        }
+    )
 
     tables = {
-        "fuel_purchases": pd.DataFrame({
-            "fuel_purchase_id": [111, 222, 333],
-            "trip_id": [11, 11, 22], 
-            "total_cost": [100.0, 50.0, 80.0],
-            "gallons": [30, 15, 25]
-        })
+        "fuel_purchases": pd.DataFrame(
+            {
+                "fuel_purchase_id": [111, 222, 333],
+                "trip_id": [11, 11, 22],
+                "total_cost": [100.0, 50.0, 80.0],
+                "gallons": [30, 15, 25],
+            }
+        )
     }
 
     # 2. Act + 3. Assert: the call itself must fail
@@ -202,8 +232,70 @@ def test_add_fuel_costs_raises_if_columns_already_exist():
 
 
 # ---------------------------------------------------------------------------
+# add_customer_info
+# ---------------------------------------------------------------------------
+
+
+def make_customers():
+    return pd.DataFrame(
+        {
+            "customer_id": [1, 2, 3],
+            "customer_type": ["A", "B", "C"],
+            "customer_name": ["Alpha", "Beta", "Gamma"],
+            "contract_start_date": ["2023-11-22", "2022-03-11", "2024-04-24"],
+        }
+    )
+
+
+def test_add_customer_info_merges_customer_table():
+    """Checks whether customer table is merged onto the loads"""
+    # 1. Arrange: three loads, each with a customer_if that exists in the customer table
+    df = pd.DataFrame({"customer_id": [1, 2, 3]})
+    tables = {"customers": make_customers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_customer_info(df, tables)
+
+    # 3. Assert: row count unchanged, customer solumns added and matched to the right rows
+    assert len(result) == 3
+    assert "customer_type" in result.columns
+    assert result.loc[0, "customer_type"] == "A"
+    assert result.loc[2, "customer_type"] == "C"
+
+
+def test_add_customer_info_leaves_nan_for_unknown_customer_id():
+    """Checks that unknown customer_id get NaN (not 0)"""
+    # 1. Arrange: three known customers and one load with an unknown customer_id
+    df = pd.DataFrame({"customer_id": [1, 2, 3, 4]})
+    tables = {"customers": make_customers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_customer_info(df, tables)
+
+    # 3. Assert: unknown customer gets NaN, known ones are filled
+    assert len(result) == 4
+    assert pd.isna(result.loc[3, "customer_type"])
+    assert result.loc[:2, "customer_type"].notna().all()
+
+
+def test_add_customer_info_converts_contract_start_date_to_datetime():
+    """Checks that datatype of contract start date-column is converted correctly."""
+    # 1. Arrange: customer table with contract_start_date as ISO strings
+    df = pd.DataFrame({"customer_id": [1, 2, 3]})
+    tables = {"customers": make_customers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_customer_info(df, tables)
+
+    # 3. Assert: column has a datetime dtype and the first value is parsed correctly
+    assert pd.api.types.is_datetime64_any_dtype(result["contract_start_date"])
+    assert result.loc[0, "contract_start_date"] == pd.Timestamp("2023-11-22")
+
+
+# ---------------------------------------------------------------------------
 # extract
 # ---------------------------------------------------------------------------
+
 
 def test_extract_raises_file_not_found_when_file_missing(tmp_path):
     """Checks that extract raises FileNotFoundError if expected CSVs do not exist."""
@@ -217,9 +309,15 @@ def test_extract_raises_file_not_found_when_file_missing(tmp_path):
 def test_extract_includes_routes_when_flag_is_true(tmp_path):
     """Checks that the routes table is loaded when include_routes=True"""
     # 1. Arrange: Write dummy CSVs into a temporary directory
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
 
     # 2. Act: Call pipeline-function
@@ -235,9 +333,15 @@ def test_extract_includes_routes_when_flag_is_true(tmp_path):
 def test_extract_excludes_routes_when_flag_is_false(tmp_path):
     """Checks that the routes table is not loaded when include_routes=False."""
     # 1. Arrange: Write dummy CSVs into a temporary directory
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
 
     # 2. Act: Call pipeline-function
@@ -253,9 +357,15 @@ def test_extract_excludes_routes_when_flag_is_false(tmp_path):
 def test_extract_includes_fleet_when_flag_is_true(tmp_path):
     """Checks that the trucks and trailers tables are loaded when include_fleet=True."""
     # 1. Arrange: Write dummy CSVs into a temporary directory
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame(
+        {"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}
+    ).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
     pd.DataFrame({"truck_id": [20]}).to_csv(tmp_path / "trucks.csv", index=False)
     pd.DataFrame({"trailer_id": [200]}).to_csv(tmp_path / "trailers.csv", index=False)
@@ -273,9 +383,15 @@ def test_extract_includes_fleet_when_flag_is_true(tmp_path):
 def test_extract_excludes_fleet_when_flag_is_false(tmp_path):
     """Checks that the trucks and trailers tables are not loaded when include_fleet=False."""
     # 1. Arrange: Write dummy CSVs into a temporary directory
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame(
+        {"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}
+    ).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
     pd.DataFrame({"truck_id": [20]}).to_csv(tmp_path / "trucks.csv", index=False)
     pd.DataFrame({"trailer_id": [200]}).to_csv(tmp_path / "trailers.csv", index=False)
@@ -293,11 +409,19 @@ def test_extract_excludes_fleet_when_flag_is_false(tmp_path):
 def test_extract_includes_fuel_purchases_when_flag_is_true(tmp_path):
     """Checks that fuel purchase table is loaded when include_costs=True."""
     # 1. Arrange: Write dummy CSVs into a temporary directory
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
-    pd.DataFrame({"fuel_purchase_id": [2], "trip_id": [100]}).to_csv(tmp_path / "fuel_purchases.csv", index=False)
+    pd.DataFrame({"fuel_purchase_id": [2], "trip_id": [100]}).to_csv(
+        tmp_path / "fuel_purchases.csv", index=False
+    )
 
     # 2. Act: Call pipeline-function
     result = extract(tmp_path, include_costs=True)
@@ -313,11 +437,19 @@ def test_extract_includes_fuel_purchases_when_flag_is_true(tmp_path):
 def test_extract_excludes_fuel_purchases_when_flag_is_false(tmp_path):
     """Checks that fuel purchase table is not loaded when include_costs=False."""
     # 1. Arrange: Write dummy CSVs into a temporary directory
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({"trip_id": [100]}).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
-    pd.DataFrame({"fuel_purchase_id": [2], "trip_id": [100]}).to_csv(tmp_path / "fuel_purchases.csv", index=False)
+    pd.DataFrame({"fuel_purchase_id": [2], "trip_id": [100]}).to_csv(
+        tmp_path / "fuel_purchases.csv", index=False
+    )
 
     # 2. Act: Call pipeline-function
     result = extract(tmp_path, include_costs=False)
@@ -330,25 +462,80 @@ def test_extract_excludes_fuel_purchases_when_flag_is_false(tmp_path):
     assert "fuel_purchases" not in result
 
 
+def test_extract_includes_customer_info_when_flag_is_true(tmp_path):
+    """Checks that customer table is loaded when include_customers=True."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10], "customer_id": [2]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame({"customer_id": [2]}).to_csv(tmp_path / "customers.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_customers=True)
+
+    # 3. Assert: Check, whether results are correct
+    assert "loads" in result
+    assert "trips" in result
+    assert "delivery_events" in result
+    assert "routes" in result
+    assert "customers" in result
+
+
+def test_extract_excludes_customer_info_when_flag_is_false(tmp_path):
+    """Checks that customer table is not loaded when include_customers=False."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10], "customer_id": [2]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame({"customer_id": [2]}).to_csv(tmp_path / "customers.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_customers=False)
+
+    # 3. Assert: Check, whether results are correct
+    assert "loads" in result
+    assert "trips" in result
+    assert "delivery_events" in result
+    assert "routes" in result
+    assert "customers" not in result
+
+
 # ---------------------------------------------------------------------------
 # transform
 # ---------------------------------------------------------------------------
 
+
 def test_flatten_events_per_load_pivots_correctly():
     """Checks that multiple event rows are correctly flattened to 1 row per load_id."""
-    dummy_merged = pd.DataFrame({
-        "load_id_x": [1, 1],
-        "load_id_y": [1, 1],
-        "event_type": ["Pickup", "Delivery"],
-        "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
-        "actual_datetime": ["2026-09-10 10:05:00", "2026-09-10 12:10:00"],
-        "facility_id": ["FAC1", "FAC2"],
-        "detention_minutes": [0, 15],
-        "on_time_flag": [True, True],
-        "location_city": ["CityA", "CityB"],
-        "location_state": ["NY", "NJ"],
-        "event_id": [10, 11]
-    })
+    dummy_merged = pd.DataFrame(
+        {
+            "load_id_x": [1, 1],
+            "load_id_y": [1, 1],
+            "event_type": ["Pickup", "Delivery"],
+            "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "actual_datetime": ["2026-09-10 10:05:00", "2026-09-10 12:10:00"],
+            "facility_id": ["FAC1", "FAC2"],
+            "detention_minutes": [0, 15],
+            "on_time_flag": [True, True],
+            "location_city": ["CityA", "CityB"],
+            "location_state": ["NY", "NJ"],
+            "event_id": [10, 11],
+        }
+    )
 
     flat = flatten_events_per_load(dummy_merged)
 
@@ -368,14 +555,19 @@ def test_merge_sources_includes_routes_when_flag_is_true():
     tables = {
         "loads": pd.DataFrame({"load_id": [1], "route_id": [10]}),
         "trips": pd.DataFrame({"load_id": [1], "trip_id": [100]}),
-        "delivery_events": pd.DataFrame({
-            "trip_id": [100],
-            "scheduled_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
-            "actual_datetime": [pd.Timestamp("2026-09-10 11:00:00")]}),
-        "routes": pd.DataFrame({
-            "route_id": [10], 
-            "origin_city": ["Hamburg"],
-        })
+        "delivery_events": pd.DataFrame(
+            {
+                "trip_id": [100],
+                "scheduled_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
+                "actual_datetime": [pd.Timestamp("2026-09-10 11:00:00")],
+            }
+        ),
+        "routes": pd.DataFrame(
+            {
+                "route_id": [10],
+                "origin_city": ["Hamburg"],
+            }
+        ),
     }
 
     # 2. Act: Call pipeline-function
@@ -396,14 +588,19 @@ def test_merge_sources_excludes_routes_when_flag_is_false():
     tables = {
         "loads": pd.DataFrame({"load_id": [1], "route_id": [10]}),
         "trips": pd.DataFrame({"load_id": [1], "trip_id": [100]}),
-        "delivery_events": pd.DataFrame({
-            "trip_id": [100],
-            "scheduled_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
-            "actual_datetime": [pd.Timestamp("2026-09-10 11:00:00")]}),
-        "routes": pd.DataFrame({
-            "route_id": [10], 
-            "origin_city": ["Hamburg"],
-        })
+        "delivery_events": pd.DataFrame(
+            {
+                "trip_id": [100],
+                "scheduled_datetime": [pd.Timestamp("2026-09-10 10:00:00")],
+                "actual_datetime": [pd.Timestamp("2026-09-10 11:00:00")],
+            }
+        ),
+        "routes": pd.DataFrame(
+            {
+                "route_id": [10],
+                "origin_city": ["Hamburg"],
+            }
+        ),
     }
 
     # 2. Act: Call pipeline-function
@@ -421,23 +618,30 @@ def test_merge_sources_excludes_routes_when_flag_is_false():
 # end-to-end
 # ---------------------------------------------------------------------------
 
+
 def test_run_pipeline_executes_end_to_end(tmp_path):
     """Checks full pipeline execution and file creation."""
     # Create mini-standard data in tmp_path
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({
-        "trip_id": [100, 100],
-        "event_id": [1, 2],
-        "event_type": ["Pickup", "Delivery"],
-        "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
-        "actual_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
-        "facility_id": ["F1", "F2"],
-        "detention_minutes": [0, 0],
-        "on_time_flag": [True, True],
-        "location_city": ["A", "B"],
-        "location_state": ["NY", "NJ"]
-    }).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame(
+        {
+            "trip_id": [100, 100],
+            "event_id": [1, 2],
+            "event_type": ["Pickup", "Delivery"],
+            "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "actual_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "facility_id": ["F1", "F2"],
+            "detention_minutes": [0, 0],
+            "on_time_flag": [True, True],
+            "location_city": ["A", "B"],
+            "location_state": ["NY", "NJ"],
+        }
+    ).to_csv(tmp_path / "delivery_events.csv", index=False)
     pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
 
     out_file = tmp_path / "output.csv"
@@ -450,43 +654,52 @@ def test_run_pipeline_executes_end_to_end(tmp_path):
 def test_run_pipeline_executes_end_to_end_with_flags(tmp_path):
     """Checks full pipeline run with routes, fleet and fuel costs enabled."""
     # Create mini-standard data in tmp_path
-    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(tmp_path / "loads.csv", index=False)
-    pd.DataFrame({
-        "load_id": [1], 
-        "trip_id": [100],
-        "truck_id": [20],
-        "trailer_id": [200]
-    }).to_csv(tmp_path / "trips.csv", index=False)
-    pd.DataFrame({
-        "trip_id": [100, 100],
-        "event_id": [1, 2],
-        "event_type": ["Pickup", "Delivery"],
-        "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
-        "actual_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
-        "facility_id": ["F1", "F2"],
-        "detention_minutes": [0, 0],
-        "on_time_flag": [True, True],
-        "location_city": ["A", "B"],
-        "location_state": ["NY", "NJ"]
-    }).to_csv(tmp_path / "delivery_events.csv", index=False)
-    pd.DataFrame({"route_id": [10], "origin_city": ["Hamburg"]}).to_csv(tmp_path / "routes.csv", index=False)
-    pd.DataFrame({"truck_id": [20], "make": ["Volvo"]}).to_csv(tmp_path / "trucks.csv", index=False)
-    pd.DataFrame({"trailer_id": [200], "trailer_type": ["Dry Van"]}).to_csv(tmp_path / "trailers.csv", index=False)
-    pd.DataFrame({
-        "fuel_purchase_id": [1, 2], 
-        "trip_id": [100, 100],
-        "total_cost": [100.0, 50.0],
-        "gallons": [30.0, 15.0]
-    }).to_csv(tmp_path / "fuel_purchases.csv", index=False)
-    
-    
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame(
+        {"load_id": [1], "trip_id": [100], "truck_id": [20], "trailer_id": [200]}
+    ).to_csv(tmp_path / "trips.csv", index=False)
+    pd.DataFrame(
+        {
+            "trip_id": [100, 100],
+            "event_id": [1, 2],
+            "event_type": ["Pickup", "Delivery"],
+            "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "actual_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "facility_id": ["F1", "F2"],
+            "detention_minutes": [0, 0],
+            "on_time_flag": [True, True],
+            "location_city": ["A", "B"],
+            "location_state": ["NY", "NJ"],
+        }
+    ).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10], "origin_city": ["Hamburg"]}).to_csv(
+        tmp_path / "routes.csv", index=False
+    )
+    pd.DataFrame({"truck_id": [20], "make": ["Volvo"]}).to_csv(
+        tmp_path / "trucks.csv", index=False
+    )
+    pd.DataFrame({"trailer_id": [200], "trailer_type": ["Dry Van"]}).to_csv(
+        tmp_path / "trailers.csv", index=False
+    )
+    pd.DataFrame(
+        {
+            "fuel_purchase_id": [1, 2],
+            "trip_id": [100, 100],
+            "total_cost": [100.0, 50.0],
+            "gallons": [30.0, 15.0],
+        }
+    ).to_csv(tmp_path / "fuel_purchases.csv", index=False)
+
     out_file = tmp_path / "output.csv"
     res = run_pipeline(
-        raw_dir=tmp_path, 
-        output_path=out_file, 
+        raw_dir=tmp_path,
+        output_path=out_file,
         include_routes=True,
         include_fleet=True,
-        include_costs=True)
+        include_costs=True,
+    )
 
     assert out_file.exists()
     assert len(res) == 1
