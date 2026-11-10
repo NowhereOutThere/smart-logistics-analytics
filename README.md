@@ -62,7 +62,7 @@ than an actual business.
 - `annual_revenue_potential` does not predict actual revenue (Spearman rho = −0.08, p = 0.27); every customer bills about 438,000 $ per year, the median customer only about 16 % of its potential
 - Revenue per mile is the same in all segments (booking type, load type, customer type, credit terms; max. difference 0.4 %); the fuel surcharge is rate × typical distance, so its strong correlation with revenue (r = 0.85) is a distance effect
 - Service level does not differ between customers beyond chance: on-time rates 50.0–60.7 % (permutation test p = 0.77), detention 85.9–98.8 min (p = 0.58); customer type and account status make no difference
-- Revenue is spread almost evenly: the top 10 % of customers generate 11.2 % of the revenue (Gini 0.04), as a random assignment of loads would (p = 0.31); the largest customer has 0.59 %”.
+- Revenue is spread almost evenly: the top 10 % of customers generate 11.2 % of the revenue (Gini 0.04), as a random assignment of loads would (p = 0.31); the largest customer has 0.59 %.
 - 16 % of the loads belong to customers with an inactive account; they are kept because the data does not show when the status changed
 ---
 
@@ -123,7 +123,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
 │   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished        | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # 🟢 Finished        | Facility, region & route profitability analysis
-│   ├── 05_customer_analysis.ipynb        # 🟢 Finished        | Delay/revenue by customer segment
+│   ├── 05_customer_analysis.ipynb        # 🟢 Finished        | Revenue, service level & concentration by customer
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
 │   └── 07_correlations.ipynb             # ⚪ Planned         | Diagnostic analysis: key drivers of delays
 ├── src/
