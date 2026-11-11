@@ -112,7 +112,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   │   └── screenshots/
 │   └── 05_customer_analysis/
 │       ├── data                           # aggregated CSV exports              
-│       ├── customer_analysis.pbix         # In Progress
+│       ├── customer_analysis.pbix         
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
 ├── data/
@@ -193,7 +193,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dashboard/README.md)
   * 🟢 `04_regional_analysis` dashboard - see [dashboard index](dashboard/README.md)
-  * 🟡 `05_customer_analysis` dashboard - see [dashboard index](dashboard/README.md)
+  * 🟢 `05_customer_analysis` dashboard - see [dashboard index](dashboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 
