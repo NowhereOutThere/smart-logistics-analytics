@@ -58,6 +58,12 @@ than an actual business.
 - All routes are profitable after the estimated fuel cost (margin per mile $1.05–$2.34); the ranking follows the route's base rate, not the distance (Columbus - Portland highest, Charlotte - Denver lowest)
 - Purchased fuel per load is almost constant (about $1,240) and unrelated to the distance, so fuel cost per mile was estimated from the fuel consumption instead
 - The location fields of delivery events match the route's origin and destination, not the assigned facility (match rate 3.45 % = chance level)
+- Customers hardly differ in revenue: mean revenue per load varies by only 3 % between customers, and a permutation test shows that this is no more than chance (p = 0.39; per mile p = 0.59)
+- `annual_revenue_potential` does not predict actual revenue (Spearman rho = −0.08, p = 0.27); every customer bills about 438,000 $ per year, the median customer only about 16 % of its potential
+- Revenue per mile is the same in all segments (booking type, load type, customer type, credit terms; max. difference 0.4 %); the fuel surcharge is rate × typical distance, so its strong correlation with revenue (r = 0.85) is a distance effect
+- Service level does not differ between customers beyond chance: on-time rates 50.0–60.7 % (permutation test p = 0.77), detention 85.9–98.8 min (p = 0.58); customer type and account status make no difference
+- Revenue is spread almost evenly: the top 10 % of customers generate 11.2 % of the revenue (Gini 0.04), as a random assignment of loads would (p = 0.31); the largest customer has 0.59 %.
+- 16 % of the loads belong to customers with an inactive account; they are kept because the data does not show when the status changed
 ---
 
 
@@ -99,9 +105,14 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   │   ├── fleet_analysis.pbix
 │   │   ├── README.md                      # Dashboard-specific details
 │   │   └── screenshots/
-│   └── 04_regional_analysis/              
-│       ├── data                           # aggregated CSV exports
-│       ├── regional_analysis.pbix
+│   ├── 04_regional_analysis/              
+│   │   ├── data                           # aggregated CSV exports
+│   │   ├── regional_analysis.pbix
+│   │   ├── README.md                      # Dashboard-specific details
+│   │   └── screenshots/
+│   └── 05_customer_analysis/
+│       ├── data                           # aggregated CSV exports              
+│       ├── customer_analysis.pbix         
 │       ├── README.md                      # Dashboard-specific details
 │       └── screenshots/
 ├── data/
@@ -112,7 +123,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   ├── 02_temporal_patterns.ipynb        # 🟢 Finished        | Seasonality, trends & weekday analysis
 │   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished        | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # 🟢 Finished        | Facility, region & route profitability analysis
-│   ├── 05_customer_analysis.ipynb        # ⚪ Planned         | Delay/revenue by customer segment
+│   ├── 05_customer_analysis.ipynb        # 🟢 Finished        | Revenue, service level & concentration by customer
 │   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
 │   └── 07_correlations.ipynb             # ⚪ Planned         | Diagnostic analysis: key drivers of delays
 ├── src/
@@ -166,12 +177,12 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
     * 🟢 Dataset selection & schema definition 
     * 🟢 Set up initial ETL pipeline for data cleaning and transformation 
 
-* 🟡 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
+* 🟢 **Phase 2: Exploratory Data Analysis (Jupyter Notebooks)**
   * 🟢 `01_delivery_performance.ipynb` - core KPIs, average lead times & delay rates
   * 🟢 `02_temporal_patterns.ipynb` - seasonality, trends & weekday analysis
   * 🟢 `03_fleet_equipment_analysis.ipynb` - delay/duration by truck, trailer & fuel efficiency
   * 🟢 `04_regional_analysis.ipynb` - facility, region & route profitability analysis
-  * ⚪ `05_customer_analysis.ipynb` - delay/revenue by customer segment
+  * 🟢 `05_customer_analysis.ipynb` - revenue, service level & concentration by customer
 
 * ⚪ **Phase 3: Diagnostic Analysis & Modeling**
   * ⚪ `06_driver_safety_analysis.ipynb` *(optional)* - driver performance & safety incidents
@@ -182,6 +193,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * 🟢 `02_temporal_patterns` dashboard - see [dashboard index](dashboard/README.md)
   * 🟢 `03_fleet_equipment_analysis` dashboard  - see [dashboard index](dashboard/README.md)
   * 🟢 `04_regional_analysis` dashboard - see [dashboard index](dashboard/README.md)
+  * 🟢 `05_customer_analysis` dashboard - see [dashboard index](dashboard/README.md)
   * ⚪ Further dashboards added alongside their respective notebooks
 ---
 

@@ -14,40 +14,69 @@ from pathlib import Path
 import pandas as pd
 
 logging.basicConfig(
-    level=logging.INFO, 
-    format="%(asctime)s | %(levelname)s | %(message)s"
-    )
+    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
+)
 logger = logging.getLogger(__name__)
-   
+
 # __file__ is path of this file (src/delivery_pipeline.py).
-# .parent -> src/, .parent.parent -> project-root. This ensures the paths are always 
+# .parent -> src/, .parent.parent -> project-root. This ensures the paths are always
 # correct, regardless of where the script or notebook is running.
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
-PROCESSED_DATA_PATH = PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
-PROCESSED_DATA_PATH_TEMPORAL = PROJECT_ROOT / "data" / "processed" / "clean_temporal_patterns.csv"
-PROCESSED_DATA_PATH_FLEET = PROJECT_ROOT / "data" / "processed" / "clean_fleet_analysis.csv"
-PROCESSED_DATA_PATH_REGIONAL = PROJECT_ROOT / "data" / "processed" / "clean_regional_analysis.csv"
+PROCESSED_DATA_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "clean_delivery_performance.csv"
+)
+PROCESSED_DATA_PATH_TEMPORAL = (
+    PROJECT_ROOT / "data" / "processed" / "clean_temporal_patterns.csv"
+)
+PROCESSED_DATA_PATH_FLEET = (
+    PROJECT_ROOT / "data" / "processed" / "clean_fleet_analysis.csv"
+)
+PROCESSED_DATA_PATH_REGIONAL = (
+    PROJECT_ROOT / "data" / "processed" / "clean_regional_analysis.csv"
+)
+PROCESSED_DATA_PATH_CUSTOMER = (
+    PROJECT_ROOT / "data" / "processed" / "clean_customer_analysis.csv"
+)
 
 EVENT_COLS = [
-    "event_id", "event_type", "facility_id", "scheduled_datetime",
-    "actual_datetime", "detention_minutes", "on_time_flag",
-    "location_city", "location_state",
+    "event_id",
+    "event_type",
+    "facility_id",
+    "scheduled_datetime",
+    "actual_datetime",
+    "detention_minutes",
+    "on_time_flag",
+    "location_city",
+    "location_state",
 ]
 PIVOT_VALUES = [c for c in EVENT_COLS if c not in ("event_id", "event_type")]
 
 
 def run_pipeline(
-    raw_dir: Path = RAW_DATA_DIR, 
+    raw_dir: Path = RAW_DATA_DIR,
     output_path: Path = PROCESSED_DATA_PATH,
     include_routes: bool = True,
     include_fleet: bool = False,
-    include_costs: bool = False
-    ) -> pd.DataFrame:
+    include_costs: bool = False,
+    include_customers: bool = False,
+) -> pd.DataFrame:
     """Run the full extract -> transform -> load pipeline and return the result."""
-    raw = extract(raw_dir, include_routes=include_routes, include_fleet=include_fleet, include_costs=include_costs)
-    df = transform(raw, include_routes=include_routes, include_fleet=include_fleet, include_costs=include_costs)
+    raw = extract(
+        raw_dir,
+        include_routes=include_routes,
+        include_fleet=include_fleet,
+        include_costs=include_costs,
+        include_customers=include_customers,
+    )
+    df = transform(
+        raw,
+        include_routes=include_routes,
+        include_fleet=include_fleet,
+        include_costs=include_costs,
+        include_customers=include_customers,
+    )
     load(df, output_path)
     return df
 
@@ -56,12 +85,14 @@ def run_pipeline(
 # Extract
 # ---------------------------------------------------------------------------
 
+
 def extract(
-        raw_dir: Path, 
-        include_routes: bool = True,
-        include_fleet: bool = False,
-        include_costs: bool = False
-        ) -> dict[str, pd.DataFrame]:
+    raw_dir: Path,
+    include_routes: bool = True,
+    include_fleet: bool = False,
+    include_costs: bool = False,
+    include_customers: bool = False,
+) -> dict[str, pd.DataFrame]:
     """Read the raw source tables and log their shapes."""
     names = ["loads", "trips", "delivery_events"]
     if include_routes:
@@ -70,6 +101,8 @@ def extract(
         names.extend(["trucks", "trailers"])
     if include_costs:
         names.append("fuel_purchases")
+    if include_customers:
+        names.append("customers")
     tables = {}
     for name in names:
         path = raw_dir / f"{name}.csv"
@@ -84,12 +117,14 @@ def extract(
 # Transform
 # ---------------------------------------------------------------------------
 
+
 def transform(
-        tables: dict[str, pd.DataFrame], 
-        include_routes: bool = True,
-        include_fleet: bool = False,
-        include_costs: bool = False
-        ) -> pd.DataFrame:
+    tables: dict[str, pd.DataFrame],
+    include_routes: bool = True,
+    include_fleet: bool = False,
+    include_costs: bool = False,
+    include_customers: bool = False,
+) -> pd.DataFrame:
     """Merge, flatten, and enrich the raw tables into one row per load."""
     merged = merge_sources(tables, include_routes=include_routes)
     flat = flatten_events_per_load(merged)
@@ -97,23 +132,22 @@ def transform(
         flat = add_fleet_info(flat, tables)
     if include_costs:
         flat = add_fuel_costs(flat, tables)
+    if include_customers:
+        flat = add_customer_info(flat, tables)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
     return clean
 
 
 def merge_sources(
-        tables: dict[str, pd.DataFrame],
-        include_routes: bool = True
-        ) -> pd.DataFrame:
+    tables: dict[str, pd.DataFrame], include_routes: bool = True
+) -> pd.DataFrame:
     """Join loads/routes/trips/delivery_events into one long table (1 row per event)."""
     df = tables["loads"]
     if include_routes:
         df = df.merge(tables["routes"], how="left", on="route_id")
-    df = (
-        df
-        .merge(tables["trips"], how="left", on="load_id")
-        .merge(tables["delivery_events"], how="left", on="trip_id")
+    df = df.merge(tables["trips"], how="left", on="load_id").merge(
+        tables["delivery_events"], how="left", on="trip_id"
     )
     df["scheduled_datetime"] = pd.to_datetime(df["scheduled_datetime"])
     df["actual_datetime"] = pd.to_datetime(df["actual_datetime"])
@@ -123,11 +157,10 @@ def merge_sources(
 
 def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
     """Pivot pickup/delivery events into columns so each load is a single row."""
-    # Merges create load_id_x/load_id_y suffixes since both `loads` and 
+    # Merges create load_id_x/load_id_y suffixes since both `loads` and
     # `delivery_events` contain a load_id column, load_id_x is the correct one
-    df = (
-          df.rename(columns={"load_id_x": "load_id"})
-          .drop(columns=["load_id_y"], errors="ignore")
+    df = df.rename(columns={"load_id_x": "load_id"}).drop(
+        columns=["load_id_y"], errors="ignore"
     )
 
     events_pivoted = df.pivot_table(
@@ -137,20 +170,19 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
         f"{event_type.lower()}_{field}" for field, event_type in events_pivoted.columns
     ]
 
-    # Pivots the table from "one row per event" (Pickup and Delivery separately) to 
+    # Pivots the table from "one row per event" (Pickup and Delivery separately) to
     # "one row per load", with event fields becoming separate columns
     # (e.g. pickup_scheduled_datetime, delivery_scheduled_datetime)
     events_pivoted = events_pivoted.reset_index()
 
     load_base_info = (
-          df.drop(columns=EVENT_COLS).
-          groupby("load_id", as_index=False).
-          first()
-          )
+        df.drop(columns=EVENT_COLS).groupby("load_id", as_index=False).first()
+    )
     flat = pd.merge(load_base_info, events_pivoted, on="load_id", how="left")
 
-    assert flat["load_id"].is_unique, \
-    "Expected exactly one row per load_id after flattening"
+    assert flat["load_id"].is_unique, (
+        "Expected exactly one row per load_id after flattening"
+    )
     logger.info("Flattened to %s loads (from %s event rows)", len(flat), len(df))
     return flat
 
@@ -158,7 +190,9 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
 def add_fleet_info(df, tables):
     """Merge truck and trailer info onto the load-level table"""
     df = df.merge(tables["trucks"], on="truck_id", how="left")
-    df = df.merge(tables["trailers"], on="trailer_id", how="left", suffixes=("_truck", "_trailer"))
+    df = df.merge(
+        tables["trailers"], on="trailer_id", how="left", suffixes=("_truck", "_trailer")
+    )
     return df
 
 
@@ -166,16 +200,16 @@ def add_fuel_costs(df, tables):
     """Merge fuel purchase info onto the load-level table"""
     fuel = tables["fuel_purchases"]
     fuel_per_trip = fuel.groupby("trip_id", as_index=False).agg(
-        fuel_cost = ("total_cost", "sum"),
-        fuel_gallons_purchased = ("gallons", "sum"),
-        n_fuel_purchases = ("fuel_purchase_id", "count")
+        fuel_cost=("total_cost", "sum"),
+        fuel_gallons_purchased=("gallons", "sum"),
+        n_fuel_purchases=("fuel_purchase_id", "count"),
     )
 
     new_columns = [c for c in fuel_per_trip.columns if c != "trip_id"]
     already_existing = [c for c in new_columns if c in df.columns]
     if already_existing:
         raise ValueError(f"Columns already exist in the load table: {already_existing}")
-    
+
     n_before = len(df)
     df = df.merge(fuel_per_trip, how="left", on="trip_id", validate="many_to_one")
     assert len(df) == n_before, "Merge with fuel data changed the number of rows"
@@ -183,7 +217,29 @@ def add_fuel_costs(df, tables):
     coverage = df["fuel_cost"].notna().mean()
     logger.info("Fuel cost available for %.1f%% of loads", coverage * 100)
     unmatched = fuel["trip_id"].isna() | ~fuel["trip_id"].isin(df["trip_id"])
-    logger.info("Fuel purchases without matching load: %d of %d", unmatched.sum(), len(fuel))
+    logger.info(
+        "Fuel purchases without matching load: %d of %d", unmatched.sum(), len(fuel)
+    )
+    return df
+
+
+def add_customer_info(df, tables):
+    """Merge customer data onto the load-level table"""
+    n_before = len(df)
+    df = df.merge(
+        tables["customers"], on="customer_id", how="left", validate="many_to_one"
+    )
+    df["contract_start_date"] = pd.to_datetime(df["contract_start_date"])
+    assert len(df) == n_before, "Merge with customer data changed the number of rows"
+
+    coverage = df["customer_name"].notna().mean()
+    logger.info("Customer data available for %.1f%% of loads", coverage * 100)
+
+    customers = tables["customers"]
+    without_loads = ~customers["customer_id"].isin(df["customer_id"])
+    logger.info(
+        "Customers without loads: %d of %d", without_loads.sum(), len(customers)
+    )
     return df
 
 
@@ -191,8 +247,10 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
     """Compute delivery duration (hours) and delay (hours) per load."""
     df = df.copy()
     df["delivery_duration_hours"] = (
-        (df["delivery_actual_datetime"] - df["pickup_actual_datetime"])
-        .dt.total_seconds() / 3600
+        (
+            df["delivery_actual_datetime"] - df["pickup_actual_datetime"]
+        ).dt.total_seconds()
+        / 3600
     ).round(2)
 
     # Note the distinction: delivery_duration_hours measures how long the
@@ -200,8 +258,10 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
     # how late it was relative to the *scheduled* delivery time. Two independent metrics
 
     df["delivery_delay_hours"] = (
-        (df["delivery_actual_datetime"] - df["delivery_scheduled_datetime"])
-        .dt.total_seconds() / 3600
+        (
+            df["delivery_actual_datetime"] - df["delivery_scheduled_datetime"]
+        ).dt.total_seconds()
+        / 3600
     ).round(2)
     df["is_delayed_delivery"] = df["delivery_delay_hours"] > 0
     return df
@@ -218,7 +278,8 @@ def drop_inconsistent_timestamps(df: pd.DataFrame) -> pd.DataFrame:
     n_removed = n_before - len(clean)
     logger.info(
         "Removed %d loads with inconsistent timestamps (%.2f%%)",
-        n_removed, n_removed / n_before * 100 if n_before else 0,
+        n_removed,
+        n_removed / n_before * 100 if n_before else 0,
     )
     return clean
 
@@ -226,6 +287,7 @@ def drop_inconsistent_timestamps(df: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Load
 # ---------------------------------------------------------------------------
+
 
 def load(df: pd.DataFrame, output_path: Path) -> None:
     """Write the cleaned dataset to disk."""
