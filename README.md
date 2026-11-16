@@ -124,7 +124,7 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
 │   ├── 03_fleet_equipment_analysis.ipynb # 🟢 Finished        | Delay/duration by truck, trailer & fuel efficiency
 │   ├── 04_regional_analysis.ipynb        # 🟢 Finished        | Facility, region & route profitability analysis
 │   ├── 05_customer_analysis.ipynb        # 🟢 Finished        | Revenue, service level & concentration by customer
-│   ├── 06_driver_safety_analysis.ipynb   # ⚪ Optional        | Driver performance & safety incidents
+│   ├── 06_driver_safety_analysis.ipynb   # 🟡 In Progress        | Driver performance & safety incidents
 │   └── 07_correlations.ipynb             # ⚪ Planned         | Diagnostic analysis: key drivers of delays
 ├── src/
 │   └── delivery_pipeline.py              # Extract/transform/load logic
@@ -184,8 +184,8 @@ see [`dashboard/README.md`](dashboard/README.md) for details and screenshots.
   * 🟢 `04_regional_analysis.ipynb` - facility, region & route profitability analysis
   * 🟢 `05_customer_analysis.ipynb` - revenue, service level & concentration by customer
 
-* ⚪ **Phase 3: Diagnostic Analysis & Modeling**
-  * ⚪ `06_driver_safety_analysis.ipynb` *(optional)* - driver performance & safety incidents
+* 🟡 **Phase 3: Diagnostic Analysis & Modeling**
+  * 🟡 `06_driver_safety_analysis.ipynb` - driver performance & safety incidents
   * ⚪ `07_correlations.ipynb` - root cause analysis of shipment delays across all dimensions
 
 * 🟡 **Phase 4: BI & Dashboarding**
