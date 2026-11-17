@@ -189,10 +189,16 @@ def flatten_events_per_load(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_fleet_info(df, tables):
     """Merge truck and trailer info onto the load-level table"""
-    df = df.merge(tables["trucks"], on="truck_id", how="left")
+    n_before = len(df)
+    df = df.merge(tables["trucks"], on="truck_id", how="left", validate="many_to_one")
     df = df.merge(
-        tables["trailers"], on="trailer_id", how="left", suffixes=("_truck", "_trailer")
+        tables["trailers"],
+        on="trailer_id",
+        how="left",
+        suffixes=("_truck", "_trailer"),
+        validate="many_to_one",
     )
+    assert len(df) == n_before, "Merge with fleet data changed the number of rows"
     return df
 
 
@@ -252,7 +258,8 @@ def add_performance_metrics(df: pd.DataFrame) -> pd.DataFrame:
         ).dt.total_seconds()
         / 3600
     ).round(2)
-
+    # Note: delays below 18 seconds round to 0.00 hours and therefore count as on time
+    # (55 loads in the current data). Kept as is to stay consistent with notebooks 1-5.
     # Note the distinction: delivery_duration_hours measures how long the
     # delivery took (pickup -> delivery), while delivery_delay_hours measures
     # how late it was relative to the *scheduled* delivery time. Two independent metrics
