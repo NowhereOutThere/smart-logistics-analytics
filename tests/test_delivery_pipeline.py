@@ -4,6 +4,7 @@ import pytest
 # Import functions from the pipeline
 from src.delivery_pipeline import (
     add_customer_info,
+    add_driver_info,
     add_fleet_info,
     add_fuel_costs,
     add_performance_metrics,
@@ -292,6 +293,11 @@ def test_add_customer_info_converts_contract_start_date_to_datetime():
     assert result.loc[0, "contract_start_date"] == pd.Timestamp("2023-11-22")
 
 
+# ---------------------------------------------------------------------------
+# add_fleet_info
+# ---------------------------------------------------------------------------
+
+
 def test_add_fleet_info_raises_for_duplicate_truck_ids():
     """Checks that duplicate truck_ids in the trucks table are not silently merged."""
     # 1. Arrange: truck 20 appears twice in the trucks table
@@ -304,6 +310,96 @@ def test_add_fleet_info_raises_for_duplicate_truck_ids():
     # 2. Act + 3. Assert: the merge must fail
     with pytest.raises(pd.errors.MergeError):
         add_fleet_info(df, tables)
+
+
+# ---------------------------------------------------------------------------
+# add_driver_info
+# ---------------------------------------------------------------------------
+
+
+def make_drivers():
+    return pd.DataFrame(
+        {
+            "driver_id": ["D1", "D2"],
+            "hire_date": ["2021-03-01", "2023-07-15"],
+            "termination_date": [None, "2024-05-31"],
+            "cdl_class": ["A", "B"],
+            "first_name": ["Marc", "Dany"],
+        }
+    )
+
+
+def test_add_driver_info_merges_driver_table():
+    """Checks that driver columns are merged onto the loads, row count unchanged."""
+    # 1. Arrange: two loads with known drivers
+    df = pd.DataFrame({"load_id": [1, 2], "driver_id": ["D1", "D2"]})
+    tables = {"drivers": make_drivers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_driver_info(df, tables)
+
+    # 3. Assert: row count unchanged, driver columns matched to the right rows
+    assert len(result) == 2
+    assert result.loc[0, "cdl_class"] == "A"
+    assert result.loc[1, "cdl_class"] == "B"
+    assert "first_name" not in result.columns
+
+
+def test_add_driver_info_leaves_nan_for_missing_and_unknown_driver_id():
+    """Checks that loads without or with unknown driver_id keep NaN (and are not dropped)."""
+    # 1. Arrange: one known driver, one unknown driver_id, one missing driver_id
+    df = pd.DataFrame({"load_id": [1, 2, 3], "driver_id": ["D1", "D9", None]})
+    tables = {"drivers": make_drivers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_driver_info(df, tables)
+
+    # 3. Assert: all three loads are still there, the last two have NaN
+    assert len(result) == 3
+    assert result.loc[0, "cdl_class"] == "A"
+    assert pd.isna(result.loc[1, "cdl_class"])
+    assert pd.isna(result.loc[2, "cdl_class"])
+
+
+def test_add_driver_info_converts_dates_to_datetime():
+    """Checks that hire and termination dates are converted to datetime (NaT if still employed)."""
+    # 1. Arrange: drivers table with dates as ISO strings, D1 still employed
+    df = pd.DataFrame({"load_id": [1], "driver_id": ["D1"]})
+    tables = {"drivers": make_drivers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_driver_info(df, tables)
+
+    # 3. Assert: datetime dtypes, correctly parsed value, NaT for the employed driver
+    assert pd.api.types.is_datetime64_any_dtype(result["hire_date"])
+    assert pd.api.types.is_datetime64_any_dtype(result["termination_date"])
+    assert result.loc[0, "hire_date"] == pd.Timestamp("2021-03-01")
+    assert pd.isna(result.loc[0, "termination_date"])
+
+
+def test_add_driver_info_raises_if_columns_already_exist():
+    """Checks that a ValueError is raised if the load table already has a driver column."""
+    # 1. Arrange: load table that already contains 'hire_date'
+    df = pd.DataFrame(
+        {"load_id": [1], "driver_id": ["D1"], "hire_date": ["2000-01-01"]}
+    )
+    tables = {"drivers": make_drivers()}
+
+    # 2. Act + 3. Assert: the call itself must fail
+    with pytest.raises(ValueError, match="already exist"):
+        add_driver_info(df, tables)
+
+
+def test_add_driver_info_raises_for_duplicate_driver_ids():
+    """Checks that duplicate driver_ids in the drivers table are not silently merged."""
+    # 1. Arrange: driver D1 appears twice in the drivers table
+    df = pd.DataFrame({"load_id": [1], "driver_id": ["D1"]})
+    drivers = pd.concat([make_drivers(), make_drivers().iloc[[0]]])
+    tables = {"drivers": drivers}
+
+    # 2. Act + 3. Assert: the merge must fail
+    with pytest.raises(pd.errors.MergeError):
+        add_driver_info(df, tables)
 
 
 # ---------------------------------------------------------------------------
@@ -526,6 +622,56 @@ def test_extract_excludes_customer_info_when_flag_is_false(tmp_path):
     assert "delivery_events" in result
     assert "routes" in result
     assert "customers" not in result
+
+
+def test_extract_includes_drivers_when_flag_is_true(tmp_path):
+    """Checks that the drivers table is loaded when include_drivers=True."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100], "driver_id": ["D1"]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame({"driver_id": ["D1"]}).to_csv(tmp_path / "drivers.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_drivers=True)
+
+    # 3. Assert: Check, whether results are correct
+    assert "drivers" in result
+    assert "loads" in result
+    assert "trips" in result
+    assert "delivery_events" in result
+
+
+def test_extract_includes_drivers_when_flag_is_false(tmp_path):
+    """Checks that the drivers table is loaded when include_drivers=False."""
+    # 1. Arrange: Write dummy CSVs into a temporary directory
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100], "driver_id": ["D1"]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame({"trip_id": [100]}).to_csv(
+        tmp_path / "delivery_events.csv", index=False
+    )
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame({"driver_id": ["D1"]}).to_csv(tmp_path / "drivers.csv", index=False)
+
+    # 2. Act: Call pipeline-function
+    result = extract(tmp_path, include_drivers=False)
+
+    # 3. Assert: Check, whether results are correct
+    assert "drivers" not in result
+    assert "loads" in result
+    assert "trips" in result
+    assert "delivery_events" in result
 
 
 # ---------------------------------------------------------------------------
