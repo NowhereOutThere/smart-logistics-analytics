@@ -867,3 +867,39 @@ def test_run_pipeline_executes_end_to_end_with_flags(tmp_path):
     assert res.loc[0, "make"] == "Volvo"
     assert res.loc[0, "fuel_cost"] == 150.0
     assert res.loc[0, "n_fuel_purchases"] == 2.0
+
+
+def test_run_pipeline_executes_end_to_end_with_drivers(tmp_path):
+    """Checks full pipeline run with the drivers flag enabled."""
+    # Create mini-standard data in tmp_path
+    pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
+        tmp_path / "loads.csv", index=False
+    )
+    pd.DataFrame({"load_id": [1], "trip_id": [100], "driver_id": ["D1"]}).to_csv(
+        tmp_path / "trips.csv", index=False
+    )
+    pd.DataFrame(
+        {
+            "trip_id": [100, 100],
+            "event_id": [1, 2],
+            "event_type": ["Pickup", "Delivery"],
+            "scheduled_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "actual_datetime": ["2026-09-10 10:00:00", "2026-09-10 12:00:00"],
+            "facility_id": ["F1", "F2"],
+            "detention_minutes": [0, 0],
+            "on_time_flag": [True, True],
+            "location_city": ["A", "B"],
+            "location_state": ["NY", "NJ"],
+        }
+    ).to_csv(tmp_path / "delivery_events.csv", index=False)
+    pd.DataFrame({"route_id": [10]}).to_csv(tmp_path / "routes.csv", index=False)
+    pd.DataFrame(
+        {"driver_id": ["D1"], "hire_date": ["2021-03-01"], "termination_date": [None]}
+    ).to_csv(tmp_path / "drivers.csv", index=False)
+
+    out_file = tmp_path / "output.csv"
+    res = run_pipeline(raw_dir=tmp_path, output_path=out_file, include_drivers=True)
+
+    assert out_file.exists()
+    assert len(res) == 1
+    assert res.loc[0, "hire_date"] == pd.Timestamp("2021-03-01")
