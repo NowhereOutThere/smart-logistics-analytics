@@ -292,6 +292,20 @@ def test_add_customer_info_converts_contract_start_date_to_datetime():
     assert result.loc[0, "contract_start_date"] == pd.Timestamp("2023-11-22")
 
 
+def test_add_fleet_info_raises_for_duplicate_truck_ids():
+    """Checks that duplicate truck_ids in the trucks table are not silently merged."""
+    # 1. Arrange: truck 20 appears twice in the trucks table
+    df = pd.DataFrame({"load_id": [1], "truck_id": [20], "trailer_id": [200]})
+    tables = {
+        "trucks": pd.DataFrame({"truck_id": [20, 20], "make": ["Volvo", "Volvo"]}),
+        "trailers": pd.DataFrame({"trailer_id": [200]}),
+    }
+
+    # 2. Act + 3. Assert: the merge must fail
+    with pytest.raises(pd.errors.MergeError):
+        add_fleet_info(df, tables)
+
+
 # ---------------------------------------------------------------------------
 # extract
 # ---------------------------------------------------------------------------
