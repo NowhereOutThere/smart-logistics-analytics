@@ -1,8 +1,9 @@
 """ETL pipeline for the delivery performance dataset.
 
-Loads raw loads/trips/routes/delivery_events tables, merges and flattens
-them to one row per load, computes delivery duration and delay metrics,
-and writes the cleaned result to data/processed/.
+Loads raw loads/trips/routes/delivery_events tables (optionally trucks, trailers,
+fuel purchases, customers and drivers), merges and flattens them to one row per
+load, computes delivery duration and delay metrics, and writes the cleaned result
+to data/processed/.
 
 Usage:
     python src/delivery_pipeline.py
