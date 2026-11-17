@@ -249,14 +249,14 @@ def make_customers():
 
 def test_add_customer_info_merges_customer_table():
     """Checks whether customer table is merged onto the loads"""
-    # 1. Arrange: three loads, each with a customer_if that exists in the customer table
+    # 1. Arrange: three loads, each with a customer_id that exists in the customer table
     df = pd.DataFrame({"customer_id": [1, 2, 3]})
     tables = {"customers": make_customers()}
 
     # 2. Act: Call pipeline-function
     result = add_customer_info(df, tables)
 
-    # 3. Assert: row count unchanged, customer solumns added and matched to the right rows
+    # 3. Assert: row count unchanged, customer columns added and matched to the right rows
     assert len(result) == 3
     assert "customer_type" in result.columns
     assert result.loc[0, "customer_type"] == "A"
