@@ -40,6 +40,9 @@ PROCESSED_DATA_PATH_REGIONAL = (
 PROCESSED_DATA_PATH_CUSTOMER = (
     PROJECT_ROOT / "data" / "processed" / "clean_customer_analysis.csv"
 )
+PROCESSED_DATA_PATH_DRIVER = (
+    PROJECT_ROOT / "data" / "processed" / "clean_driver_analysis.csv"
+)
 
 EVENT_COLS = [
     "event_id",
@@ -62,6 +65,7 @@ def run_pipeline(
     include_fleet: bool = False,
     include_costs: bool = False,
     include_customers: bool = False,
+    include_drivers: bool = False,
 ) -> pd.DataFrame:
     """Run the full extract -> transform -> load pipeline and return the result."""
     raw = extract(
@@ -70,6 +74,7 @@ def run_pipeline(
         include_fleet=include_fleet,
         include_costs=include_costs,
         include_customers=include_customers,
+        include_drivers=include_drivers,
     )
     df = transform(
         raw,
@@ -77,6 +82,7 @@ def run_pipeline(
         include_fleet=include_fleet,
         include_costs=include_costs,
         include_customers=include_customers,
+        include_drivers=include_drivers,
     )
     load(df, output_path)
     return df
@@ -93,6 +99,7 @@ def extract(
     include_fleet: bool = False,
     include_costs: bool = False,
     include_customers: bool = False,
+    include_drivers: bool = False,
 ) -> dict[str, pd.DataFrame]:
     """Read the raw source tables and log their shapes."""
     names = ["loads", "trips", "delivery_events"]
@@ -104,6 +111,8 @@ def extract(
         names.append("fuel_purchases")
     if include_customers:
         names.append("customers")
+    if include_drivers:
+        names.append("drivers")
     tables = {}
     for name in names:
         path = raw_dir / f"{name}.csv"
@@ -125,6 +134,7 @@ def transform(
     include_fleet: bool = False,
     include_costs: bool = False,
     include_customers: bool = False,
+    include_drivers: bool = False,
 ) -> pd.DataFrame:
     """Merge, flatten, and enrich the raw tables into one row per load."""
     merged = merge_sources(tables, include_routes=include_routes)
@@ -135,6 +145,8 @@ def transform(
         flat = add_fuel_costs(flat, tables)
     if include_customers:
         flat = add_customer_info(flat, tables)
+    if include_drivers:
+        flat = add_driver_info(flat, tables)
     with_metrics = add_performance_metrics(flat)
     clean = drop_inconsistent_timestamps(with_metrics)
     return clean
@@ -249,6 +261,45 @@ def add_customer_info(df, tables):
     logger.info(
         "Customers without loads: %d of %d", without_loads.sum(), len(customers)
     )
+    return df
+
+
+def add_driver_info(df: pd.DataFrame, tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Merge driver data onto the load-level table (via the trip's driver_id)"""
+    drivers = tables["drivers"]
+
+    new_columns = [c for c in drivers.columns if c != "driver_id"]
+    already_existing = [c for c in new_columns if c in df.columns]
+    if already_existing:
+        raise ValueError(f"Columns already exist in the load table: {already_existing}")
+
+    n_before = len(df)
+    DRIVER_PERSONAL_COLUMNS = [
+        "first_name",
+        "last_name",
+        "license_number",
+        "date_of_birth",
+    ]
+    drivers = tables["drivers"].drop(columns=DRIVER_PERSONAL_COLUMNS, errors="ignore")
+
+    df = df.merge(drivers, on="driver_id", how="left", validate="many_to_one")
+    assert len(df) == n_before, "Merge with driver data changed the number of rows"
+    for col in ("hire_date", "termination_date"):
+        df[col] = pd.to_datetime(df[col])
+
+    missing_driver_id = df["driver_id"].isna()
+    logger.info(
+        "Loads without driver_id: %d of %d (%.1f%%)",
+        missing_driver_id.sum(),
+        len(df),
+        missing_driver_id.mean() * 100,
+    )
+    unknown = df["driver_id"].notna() & ~df["driver_id"].isin(drivers["driver_id"])
+    logger.info(
+        "Loads with a driver_id missing in the drivers table: %d", unknown.sum()
+    )
+    without_loads = ~drivers["driver_id"].isin(df["driver_id"])
+    logger.info("Drivers without loads: %d of %d", without_loads.sum(), len(drivers))
     return df
 
 
