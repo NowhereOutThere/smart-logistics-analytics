@@ -145,10 +145,12 @@ def merge_sources(
     """Join loads/routes/trips/delivery_events into one long table (1 row per event)."""
     df = tables["loads"]
     if include_routes:
-        df = df.merge(tables["routes"], how="left", on="route_id")
-    df = df.merge(tables["trips"], how="left", on="load_id").merge(
-        tables["delivery_events"], how="left", on="trip_id"
-    )
+        df = df.merge(
+            tables["routes"], how="left", on="route_id", validate="many_to_one"
+        )
+    df = df.merge(
+        tables["trips"], how="left", on="load_id", validate="one_to_one"
+    ).merge(tables["delivery_events"], how="left", on="trip_id")
     df["scheduled_datetime"] = pd.to_datetime(df["scheduled_datetime"])
     df["actual_datetime"] = pd.to_datetime(df["actual_datetime"])
     logger.info("Merged table: %s rows, %s columns", *df.shape)
