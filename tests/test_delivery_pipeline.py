@@ -649,8 +649,8 @@ def test_extract_includes_drivers_when_flag_is_true(tmp_path):
     assert "delivery_events" in result
 
 
-def test_extract_includes_drivers_when_flag_is_false(tmp_path):
-    """Checks that the drivers table is loaded when include_drivers=False."""
+def test_extract_excludes_drivers_when_flag_is_false(tmp_path):
+    """Checks that the drivers table is not loaded when include_drivers=False."""
     # 1. Arrange: Write dummy CSVs into a temporary directory
     pd.DataFrame({"load_id": [1], "route_id": [10]}).to_csv(
         tmp_path / "loads.csv", index=False
@@ -772,6 +772,21 @@ def test_merge_sources_excludes_routes_when_flag_is_false():
     assert "trip_id" in result.columns
     assert "scheduled_datetime" in result.columns
     assert result.loc[0, "trip_id"] == 100
+
+
+def test_merge_sources_raises_for_duplicate_trips_per_load():
+    """Checks that two trips for the same load are not silently merged."""
+    # 1. Arrange: load 1 has two trips
+    tables = {
+        "loads": pd.DataFrame({"load_id": [1], "route_id": [10]}),
+        "routes": pd.DataFrame({"route_id": [10]}),
+        "trips": pd.DataFrame({"load_id": [1, 1], "trip_id": [100, 101]}),
+        "delivery_events": pd.DataFrame({"trip_id": [100]}),
+    }
+
+    # 2. Act + 3. Assert: the merge must fail
+    with pytest.raises(pd.errors.MergeError):
+        merge_sources(tables)
 
 
 # ---------------------------------------------------------------------------
