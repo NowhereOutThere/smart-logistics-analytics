@@ -402,6 +402,20 @@ def test_add_driver_info_raises_for_duplicate_driver_ids():
         add_driver_info(df, tables)
 
 
+def test_add_driver_info_ignores_collision_on_dropped_personal_column():
+    """Checks that a personal column in the load table does not raise, since it is dropped before the merge."""
+    # 1. Arrange: load table already has a 'first_name' column
+    df = pd.DataFrame({"load_id": [1], "driver_id": ["D1"], "first_name": ["x"]})
+    tables = {"drivers": make_drivers()}
+
+    # 2. Act: Call pipeline-function
+    result = add_driver_info(df, tables)
+
+    # 3. Assert: no error, the load table's own column is untouched, driver data merged
+    assert result.loc[0, "first_name"] == "x"
+    assert result.loc[0, "cdl_class"] == "A"
+
+
 # ---------------------------------------------------------------------------
 # extract
 # ---------------------------------------------------------------------------
