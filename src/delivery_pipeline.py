@@ -57,6 +57,13 @@ EVENT_COLS = [
 ]
 PIVOT_VALUES = [c for c in EVENT_COLS if c not in ("event_id", "event_type")]
 
+DRIVER_PERSONAL_COLUMNS = [
+    "first_name",
+    "last_name",
+    "license_number",
+    "date_of_birth",
+]
+
 
 def run_pipeline(
     raw_dir: Path = RAW_DATA_DIR,
@@ -266,7 +273,8 @@ def add_customer_info(df, tables):
 
 def add_driver_info(df: pd.DataFrame, tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Merge driver data onto the load-level table (via the trip's driver_id)"""
-    drivers = tables["drivers"]
+    # Personal columns are not needed for the analysis, so they are dropped first
+    drivers = tables["drivers"].drop(columns=DRIVER_PERSONAL_COLUMNS, errors="ignore")
 
     new_columns = [c for c in drivers.columns if c != "driver_id"]
     already_existing = [c for c in new_columns if c in df.columns]
@@ -274,16 +282,9 @@ def add_driver_info(df: pd.DataFrame, tables: dict[str, pd.DataFrame]) -> pd.Dat
         raise ValueError(f"Columns already exist in the load table: {already_existing}")
 
     n_before = len(df)
-    DRIVER_PERSONAL_COLUMNS = [
-        "first_name",
-        "last_name",
-        "license_number",
-        "date_of_birth",
-    ]
-    drivers = tables["drivers"].drop(columns=DRIVER_PERSONAL_COLUMNS, errors="ignore")
-
     df = df.merge(drivers, on="driver_id", how="left", validate="many_to_one")
     assert len(df) == n_before, "Merge with driver data changed the number of rows"
+
     for col in ("hire_date", "termination_date"):
         df[col] = pd.to_datetime(df[col])
 
